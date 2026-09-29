@@ -26,7 +26,6 @@ appdir-matrix compare --left before.json --right after.json
 
 This is a Phase 0 proof slice. It does not yet claim the complete Phase 0 exit gate because live GitHub resolution has not been exercised in this checkpoint, schema migration/version negotiation is not implemented, browser runtime smoke is environment-blocked, and the existing UI still owns its own JS rendering/export behavior.
 
-
 ## Captured real GitHub replay
 
 The repository includes a real public GitHub capture under `fixtures/github-live/` for `octocat/Hello-World`. The fixture contains:

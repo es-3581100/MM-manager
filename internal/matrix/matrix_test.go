@@ -182,7 +182,6 @@ func TestGitHubResolverRejectsMissingNamedSubpath(t *testing.T) {
 	}
 }
 
-
 func TestCapturedGitHubFixtureReplaysOffline(t *testing.T) {
 	fixtureDir := filepath.Join("..", "..", "fixtures", "github-live")
 	client, capture, err := NewGitHubFixtureClient(fixtureDir)
