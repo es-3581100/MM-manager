@@ -1,0 +1,23 @@
+{
+  "schema": "app-dir-matrix.github-fixture/v1",
+  "captured_at": "2026-09-29T06:05:15Z",
+  "source": "https://api.github.com",
+  "repository": "octocat/Hello-World",
+  "capture_method": "GitHub API connector",
+  "requests": [
+    {
+      "method": "GET",
+      "request_uri": "/repos/octocat/Hello-World",
+      "status": 200,
+      "response_file": "octocat/Hello-World/repo.json",
+      "sha256": "607d2ca1df1d71a64fd45553c8a1360de7a52c35b8dbb2f6e9e69f1c345bb572"
+    },
+    {
+      "method": "GET",
+      "request_uri": "/repos/octocat/Hello-World/git/trees/master?recursive=1",
+      "status": 200,
+      "response_file": "octocat/Hello-World/tree-master.json",
+      "sha256": "23f3f4cce7631d59dc56deaec224736de7813861f3de28ea6db9569fe6d4ea83"
+    }
+  ]
+}

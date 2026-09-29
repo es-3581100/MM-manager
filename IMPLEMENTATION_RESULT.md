@@ -7,7 +7,7 @@ Checkpoint: Phase 0 deterministic core-truth slice
 
 Recovered the supplied v0.2.0 reusable Matrix core rather than replacing it. The existing core already contains the browser matrix/tree/graph runtime, browser-side ref-glob compilation, pinned-tree hydration/export, and CodeGraph semantic overlay. The builder handoff and its embedded roadmap/design source were preserved byte-for-byte in this workspace.
 
-There was no supplied Git repository around these files in `/mnt/data`, so this checkpoint was built in a new isolated workspace and was not committed or pushed.
+The supplied files were recovered into an isolated build workspace and the project has since been published to `es-3581100/MM-manager`. This chunk continues from that repository state rather than rebuilding it.
 
 ## Master plan
 
@@ -37,6 +37,9 @@ There was no supplied Git repository around these files in `/mnt/data`, so this 
 - Project comparator reporting pin changes plus added/removed/changed paths.
 - Regression/unit tests and an end-to-end Phase 0 smoke script.
 - Local CLI commands: `normalize`, `pin`, `build`, `verify`, `compare`.
+- Hash-checked `app-dir-matrix.github-fixture/v1` replay transport for real GitHub API captures.
+- `pin --github-fixture-dir` offline replay with no network fallback and capture provenance embedded into the project ref pack.
+- Real public `octocat/Hello-World` metadata/tree capture plus deterministic end-to-end replay script.
 
 ## Verification
 
@@ -89,7 +92,6 @@ The Phase 0 tool is Go rather than a browser-only script. This is an implementat
 
 ## Remaining blockers
 
-- Run `pin` against at least one real public GitHub repository and preserve the raw response as a regression fixture.
 - Rerun generated HTML in a healthy browser/headless environment and capture an actual runtime DOM/screenshot smoke.
 - Add explicit project schema migration/version-negotiation tooling.
 - Add import of existing v0.2.0 exported browser snapshots/manifests into `project/v1`.
@@ -97,4 +99,12 @@ The Phase 0 tool is Go rather than a browser-only script. This is an implementat
 
 ## Next executable slice
 
-Use one small public repository to perform a real ref-glob → GitHub metadata/default branch → complete recursive tree → named-subpath verification → project/v1 → deterministic HTML → reopen/verify round-trip. Save the raw GitHub response as a fixture, then rerun the whole flow offline and compare the live result to the fixture. Phase 1 expansion stays blocked until that Phase 0 evidence and browser smoke pass.
+Implement explicit `project/v1` schema-version negotiation and a bounded migration framework. It must reject unknown future versions without guessing, preserve provenance through migration, and prove migrate → deterministic build → reopen/verify using fixtures. Phase 1 expansion stays blocked until that migration evidence and browser smoke pass.
+
+## 2026-09-29 real-source replay increment
+
+The recorded next slice is now complete. A real public GitHub API capture for `octocat/Hello-World` preserves repository metadata plus the complete recursive `master` tree as raw JSON response fixtures. The fixture manifest hashes each response and acts as a request allowlist.
+
+`pin --github-fixture-dir fixtures/github-live` replays those exact responses entirely offline. Any unrecorded request fails; there is no automatic network fallback. Response tampering is detected before JSON parsing.
+
+The replay independently reproduced the same `project/v1` bytes twice, verified the named `README` subpath, rendered the Matrix artifact, reopened it, validated the sidecar SHA-256, compared the duplicate projects as equal, and passed JavaScript syntax validation. Phase 0 remains `partial` only because browser-runtime smoke and schema migration/version negotiation are still unresolved.

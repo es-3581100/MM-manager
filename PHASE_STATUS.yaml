@@ -7,13 +7,18 @@ phase_0:
     - internal/matrix/model.go
     - internal/matrix/normalize.go
     - internal/matrix/github.go
+    - internal/matrix/github_fixture.go
     - internal/matrix/artifact.go
     - internal/matrix/verify.go
     - internal/matrix/compare.go
     - scripts/smoke.sh
+    - scripts/github-live-replay.sh
+    - fixtures/github-live/capture.json
+    - fixtures/github-live/octocat/Hello-World/repo.json
+    - fixtures/github-live/octocat/Hello-World/tree-master.json
+    - dist/github-live-replay/verify.json
     - dist/verify.json
   blockers:
-    - live GitHub pin round-trip not yet recorded
     - browser runtime smoke blocked by current Chromium/headless environment
     - schema migration/version negotiation not yet implemented
   last_verified: 2026-09-29

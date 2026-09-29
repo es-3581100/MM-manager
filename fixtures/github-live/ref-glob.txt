@@ -1,0 +1,5 @@
+<ref-block>
+https://github.com/octocat/Hello-World
+https://github.com/octocat/Hello-World/blob/master/README
+Note: live public GitHub capture used only as structural/reference evidence.
+</ref-block>

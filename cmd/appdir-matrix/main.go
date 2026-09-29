@@ -149,6 +149,7 @@ func cmdPin(args []string) error {
 	projectID := fs.String("project-id", "imported-project", "project id")
 	buildID := fs.String("build-id", "pin-001", "deterministic build id")
 	api := fs.String("github-api", "https://api.github.com", "GitHub API base URL")
+	fixtureDir := fs.String("github-fixture-dir", "", "offline GitHub API fixture directory containing capture.json")
 	if err := fs.Parse(args); err != nil {
 		return err
 	}
@@ -161,9 +162,34 @@ func cmdPin(args []string) error {
 	}
 	refs := matrix.NormalizeRefGlob(string(b))
 	r := matrix.GitHubResolver{BaseURL: *api, Token: os.Getenv("GITHUB_TOKEN")}
+	var replayFixture *matrix.GitHubFixture
+	if *fixtureDir != "" {
+		client, fixture, err := matrix.NewGitHubFixtureClient(*fixtureDir)
+		if err != nil {
+			return err
+		}
+		replayFixture = &fixture
+		r.Client = client
+		r.Token = ""
+		fmt.Fprintf(os.Stderr, "offline GitHub fixture: %s captured %s via %s\n", fixture.Repository, fixture.CapturedAt, fixture.CaptureMethod)
+	}
 	p, err := r.Pin(context.Background(), refs, *projectID, *buildID)
 	if err != nil {
 		return err
+	}
+	if replayFixture != nil {
+		pack, ok := p.RefPack.(map[string]any)
+		if !ok || pack == nil {
+			pack = map[string]any{}
+		}
+		pack["github_fixture"] = map[string]any{
+			"schema":         replayFixture.Schema,
+			"captured_at":    replayFixture.CapturedAt,
+			"source":         replayFixture.Source,
+			"repository":     replayFixture.Repository,
+			"capture_method": replayFixture.CaptureMethod,
+		}
+		p.RefPack = pack
 	}
 	j, err := json.MarshalIndent(p, "", "  ")
 	if err != nil {

@@ -181,3 +181,83 @@ func TestGitHubResolverRejectsMissingNamedSubpath(t *testing.T) {
 		t.Fatalf("err=%v", err)
 	}
 }
+
+
+func TestCapturedGitHubFixtureReplaysOffline(t *testing.T) {
+	fixtureDir := filepath.Join("..", "..", "fixtures", "github-live")
+	client, capture, err := NewGitHubFixtureClient(fixtureDir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if capture.Repository != "octocat/Hello-World" || capture.CaptureMethod == "" {
+		t.Fatalf("capture=%+v", capture)
+	}
+	b, err := os.ReadFile(filepath.Join(fixtureDir, "ref-glob.txt"))
+	if err != nil {
+		t.Fatal(err)
+	}
+	refs := NormalizeRefGlob(string(b))
+	p, err := (GitHubResolver{BaseURL: "https://api.github.com", Client: client}).Pin(context.Background(), refs, "github-live-replay", "capture-20260929")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(p.Repositories) != 1 {
+		t.Fatalf("repositories=%d", len(p.Repositories))
+	}
+	r := p.Repositories[0]
+	if r.Repo != "octocat/Hello-World" || r.Branch != "master" || r.TreeSHA != "7fd1a60b01f91b314f59955a4e4d4e80d8edf11d" {
+		t.Fatalf("repo=%+v", r)
+	}
+	if len(r.Tree) != 1 || r.Tree[0].Path != "README" || r.Tree[0].SHA != "980a0d5f19a64b4b30a87d4206aade58726b60e3" {
+		t.Fatalf("tree=%+v", r.Tree)
+	}
+	verified := false
+	for _, e := range p.Evidence {
+		if e.Class == "verified_subpath" && e.Repo == "octocat/Hello-World" && e.Path == "README" {
+			verified = true
+		}
+	}
+	if !verified {
+		t.Fatal("captured fixture replay did not preserve named-subpath verification")
+	}
+}
+
+func TestGitHubFixtureHasNoNetworkFallback(t *testing.T) {
+	fixtureDir := filepath.Join("..", "..", "fixtures", "github-live")
+	client, _, err := NewGitHubFixtureClient(fixtureDir)
+	if err != nil {
+		t.Fatal(err)
+	}
+	req, err := http.NewRequest(http.MethodGet, "https://api.github.com/repos/octocat/Hello-World/git/trees/not-recorded?recursive=1", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = client.Do(req)
+	if err == nil || !strings.Contains(err.Error(), "no recorded response") {
+		t.Fatalf("expected offline fixture miss, got %v", err)
+	}
+}
+
+func TestGitHubFixtureRejectsTamperedResponse(t *testing.T) {
+	src := filepath.Join("..", "..", "fixtures", "github-live")
+	dst := t.TempDir()
+	if err := os.CopyFS(dst, os.DirFS(src)); err != nil {
+		t.Fatal(err)
+	}
+	response := filepath.Join(dst, "octocat", "Hello-World", "tree-master.json")
+	f, err := os.OpenFile(response, os.O_APPEND|os.O_WRONLY, 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := f.WriteString(" "); err != nil {
+		f.Close()
+		t.Fatal(err)
+	}
+	if err := f.Close(); err != nil {
+		t.Fatal(err)
+	}
+	_, _, err = NewGitHubFixtureClient(dst)
+	if err == nil || !strings.Contains(err.Error(), "hash mismatch") {
+		t.Fatalf("expected hash mismatch, got %v", err)
+	}
+}

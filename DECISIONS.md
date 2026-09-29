@@ -81,3 +81,17 @@
 **Alternatives considered:** ignore browser smoke; substitute screenshots from another artifact.
 
 **Consequence:** Next checkpoint should rerun browser smoke in a healthy desktop/headless environment.
+
+## D-007 — Real GitHub captures become hash-checked offline regression fixtures
+
+**Context:** Phase 0 needed evidence that default-branch resolution, recursive-tree pinning, and explicit subpath verification work against a real public GitHub response without making future tests depend on GitHub availability or mutable branch state.
+
+**Decision:** Preserve real API response bytes behind `app-dir-matrix.github-fixture/v1`. Each recorded request is allowlisted by method + request URI and bound to a response file by SHA-256. `pin --github-fixture-dir` replays only those responses; unrecorded requests fail and no network fallback exists.
+
+**Reason:** The same captured source evidence can be independently replayed, audited, and hash-checked after the live source changes or becomes unavailable.
+
+**Alternatives considered:** live GitHub on every test run; hand-written reduced fixtures only; silently falling back to live GitHub when a fixture misses.
+
+**Consequence:** Real-source evidence is durable and deterministic, but capture freshness remains explicit rather than pretending an old fixture is current live truth.
+
+**Evidence:** `fixtures/github-live/capture.json`, `TestCapturedGitHubFixtureReplaysOffline`, `TestGitHubFixtureHasNoNetworkFallback`, `TestGitHubFixtureRejectsTamperedResponse`, `scripts/github-live-replay.sh`.

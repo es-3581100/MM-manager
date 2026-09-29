@@ -163,3 +163,34 @@ phase0 HTML sha256 29d5638725fc2fb27d84f3791479bbbaf61d85b3fbb19dc30d7e54d82622d
 ```
 
 The generated HTML begins with an all-rights-reserved provenance comment and the reusable web template carries the same notice. `go test ./...`, `go vet ./...`, the deterministic smoke, reopen verification, and `node --check` remained passing after the change.
+
+
+## Real public GitHub capture + offline replay
+
+A live GitHub API capture was recorded on 2026-09-29 for the public repository `octocat/Hello-World`. GitHub reported default branch `master`; the recursive tree response was complete (`truncated: false`) at tree SHA `7fd1a60b01f91b314f59955a4e4d4e80d8edf11d` and contained the named `README` blob SHA `980a0d5f19a64b4b30a87d4206aade58726b60e3`.
+
+Captured response integrity:
+
+```text
+607d2ca1df1d71a64fd45553c8a1360de7a52c35b8dbb2f6e9e69f1c345bb572  fixtures/github-live/octocat/Hello-World/repo.json
+23f3f4cce7631d59dc56deaec224736de7813861f3de28ea6db9569fe6d4ea83  fixtures/github-live/octocat/Hello-World/tree-master.json
+de810ed5b2386aa06505ca795115d3abe6ae55af4584538f89bdad2132520c87  fixtures/github-live/capture.json
+```
+
+Command:
+
+```bash
+bash scripts/github-live-replay.sh
+```
+
+Result: PASS.
+
+The replay ran without network fallback and performed normalize → pin twice → byte comparison → deterministic HTML build → reopen verification → identical-project comparison → JavaScript syntax check. The generated project preserved GitHub capture provenance in `ref_pack.github_fixture`. The verifier reported one repository, one structural entry, matching pins/tree entries, `authority: none`, and a valid SHA-256 sidecar.
+
+Additional regression tests:
+
+- `TestCapturedGitHubFixtureReplaysOffline`: PASS.
+- `TestGitHubFixtureHasNoNetworkFallback`: PASS.
+- `TestGitHubFixtureRejectsTamperedResponse`: PASS.
+
+This resolves the previous “live GitHub pin round-trip not yet recorded” blocker. It does not resolve browser-runtime smoke or schema migration/version-negotiation.

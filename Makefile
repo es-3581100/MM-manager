@@ -1,4 +1,4 @@
-.PHONY: test vet smoke build
+.PHONY: test vet smoke github-live-replay build
 
 test:
 	go test ./...
@@ -12,3 +12,6 @@ build:
 
 smoke:
 	bash scripts/smoke.sh
+
+github-live-replay:
+	bash scripts/github-live-replay.sh

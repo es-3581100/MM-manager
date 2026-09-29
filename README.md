@@ -64,6 +64,14 @@ ref glob
 
 Current surfaces include repository deployment cards, keyword/regex search, tree and matrix navigation, structural parent/child graphing, optional CodeGraph semantic overlays, pinned-tree loading, live-branch refresh, manifest export, offline snapshot export, and an MCP-shaped ref-glob ingestion contract.
 
+Current Phase 0 verification also includes a preserved real GitHub API capture for `octocat/Hello-World`. The capture records the repository metadata response and recursive `master` tree response with SHA-256 hashes, then replays those responses through the same resolver using `--github-fixture-dir`. Replay is deliberately networkless: an API request not listed in `capture.json` fails rather than falling back to live GitHub. The named `README` path is re-verified from the captured tree, and the resulting `project/v1` document is rendered, reopened, hash-verified, and reproduced byte-for-byte offline.
+
+Run it with:
+
+```bash
+make github-live-replay
+```
+
 The following roadmap deliberately separates **what should exist eventually** from **what is already implemented**.
 
 ---

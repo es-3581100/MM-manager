@@ -372,7 +372,7 @@ Visual direction remains the existing dense technical instrument-panel language:
 
 ## Rollout/deployment strategy
 
-Local CLI and self-contained HTML first. Hosted services remain optional additive layers. Stable files and schemas precede daemons. Every hosted/team surface must preserve export back to the open project document.
+Local CLI and self-contained HTML first. Hosted services remain optional additive layers. Stable files and schemas precede daemons. Every hosted/team surface must preserve export back to the documented portable project document.
 
 ## Capital activation gates
 
@@ -380,4 +380,4 @@ Community remains Phase 0+. Personal cannot activate before a useful scoped cont
 
 ## Next executable slice
 
-Exercise `pin` against one small real public GitHub repository, save the raw API response as a regression fixture, produce a real project/v1 document, then render/verify/compare it entirely offline. Do not move into Phase 1 until this real-source Phase 0 round-trip and browser smoke are recorded.
+The real-source capture/replay slice is complete. Next, implement explicit `app-dir-matrix.project/v1` schema-version negotiation and a bounded migration framework that can reject unsupported future versions without guessing, preserve source provenance through migrations, and prove migrate → build → reopen/verify with fixtures. Phase 1 expansion remains blocked until Phase 0 migration semantics are verified and the browser runtime smoke is recorded in a healthy browser environment.
