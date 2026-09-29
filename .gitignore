@@ -1,0 +1,14 @@
+# Local build outputs
+/bin/
+*.test
+*.out
+
+# Local/editor state
+.DS_Store
+.idea/
+.vscode/
+
+# Temporary files
+*.tmp
+*.swp
+*~

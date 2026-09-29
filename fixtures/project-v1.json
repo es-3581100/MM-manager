@@ -1,0 +1,59 @@
+{
+  "schema_version": "app-dir-matrix.project/v1",
+  "core_version": "0.2.0",
+  "project_id": "phase0-smoke",
+  "build": {
+    "id": "phase0-fixture-001",
+    "source": "deterministic synthetic fixture"
+  },
+  "repositories": [
+    {
+      "repo": "fixture/alpha",
+      "branch": "main",
+      "tree_sha": "tree-alpha-001",
+      "deployment": "fixture-core",
+      "source_class": "fixture",
+      "description": "Synthetic deterministic repository used to prove offline packaging and verification.",
+      "boundary": "Fixture evidence only; no execution authority.",
+      "truncated": false,
+      "tree": [
+        {"path": "README.md", "type": "blob", "size": 12, "sha": "blob-readme-001"},
+        {"path": "cmd", "type": "tree", "size": null, "sha": "tree-cmd-001"},
+        {"path": "cmd/app", "type": "tree", "size": null, "sha": "tree-app-001"},
+        {"path": "cmd/app/main.go", "type": "blob", "size": 42, "sha": "blob-main-001"},
+        {"path": "internal", "type": "tree", "size": null, "sha": "tree-internal-001"},
+        {"path": "internal/model.go", "type": "blob", "size": 30, "sha": "blob-model-001"}
+      ]
+    }
+  ],
+  "evidence": [
+    {
+      "id": "annotation-001",
+      "class": "annotation",
+      "claim": "Synthetic fixture is intentionally non-authoritative.",
+      "source": "fixtures/project-v1.json",
+      "authority": "none"
+    },
+    {
+      "id": "tree-001",
+      "class": "git_tree",
+      "claim": "fixture/alpha has six pinned structural entries in this fixture.",
+      "repo": "fixture/alpha",
+      "value": 6,
+      "authority": "none"
+    },
+    {
+      "id": "level-001",
+      "class": "derived_level",
+      "claim": "cmd/app/main.go derives to trunk from path depth 3.",
+      "repo": "fixture/alpha",
+      "path": "cmd/app/main.go",
+      "value": "trunk",
+      "authority": "none"
+    }
+  ],
+  "ref_pack": {
+    "id": "phase0-smoke-refpack",
+    "notes": ["fixture note remains context, not authority"]
+  }
+}

@@ -1,0 +1,6 @@
+<ref-block>
+[alpha](https://github.com/fixture/alpha)
+https\://github.com/fixture/alpha/tree/main/cmd/app
+https://example.invalid/reference
+Note: the fixture reference is descriptive only.
+</ref-block>

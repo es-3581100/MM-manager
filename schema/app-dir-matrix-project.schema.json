@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://app-dir-matrix.local/schema/project-v1.json",
+  "title": "App-Dir Matrix Project Document",
+  "type": "object",
+  "required": ["schema_version", "core_version", "project_id", "repositories", "evidence"],
+  "properties": {
+    "schema_version": {"const": "app-dir-matrix.project/v1"},
+    "core_version": {"type": "string", "minLength": 1},
+    "project_id": {"type": "string", "pattern": "^[a-z0-9][a-z0-9._-]*$"},
+    "build": {
+      "type": "object",
+      "required": ["id", "source"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "source": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "repositories": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/repository"}
+    },
+    "evidence": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/evidence"}
+    },
+    "ref_pack": {}
+  },
+  "$defs": {
+    "treeEntry": {
+      "type": "object",
+      "required": ["path", "type", "sha"],
+      "properties": {
+        "path": {"type": "string", "minLength": 1},
+        "type": {"enum": ["tree", "blob"]},
+        "size": {"type": ["integer", "null"], "minimum": 0},
+        "sha": {"type": "string", "minLength": 1}
+      },
+      "additionalProperties": false
+    },
+    "repository": {
+      "type": "object",
+      "required": ["repo", "branch", "tree_sha", "deployment", "source_class", "description", "boundary", "tree"],
+      "properties": {
+        "repo": {"type": "string", "pattern": "^[^/]+/[^/]+$"},
+        "branch": {"type": "string", "minLength": 1},
+        "tree_sha": {"type": "string", "minLength": 1},
+        "deployment": {"type": "string", "minLength": 1},
+        "source_class": {"enum": ["owned", "official", "reference", "unknown", "fixture"]},
+        "description": {"type": "string"},
+        "boundary": {"type": "string"},
+        "site": {"type": "string"},
+        "tree": {"type": "array", "items": {"$ref": "#/$defs/treeEntry"}},
+        "truncated": {"type": "boolean", "const": false}
+      },
+      "additionalProperties": false
+    },
+    "evidence": {
+      "type": "object",
+      "required": ["id", "class", "claim", "authority"],
+      "properties": {
+        "id": {"type": "string", "minLength": 1},
+        "class": {"enum": ["annotation", "repo_metadata", "git_tree", "verified_subpath", "semantic_graph", "derived_level"]},
+        "claim": {"type": "string", "minLength": 1},
+        "source": {"type": "string"},
+        "repo": {"type": "string"},
+        "path": {"type": "string"},
+        "value": {},
+        "authority": {"const": "none"}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

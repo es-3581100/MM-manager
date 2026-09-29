@@ -1,0 +1,78 @@
+schema: app-dir-matrix.phase-status/v1
+updated: 2026-09-29
+phase_0:
+  status: partial
+  evidence:
+    - schema/app-dir-matrix-project.schema.json
+    - internal/matrix/model.go
+    - internal/matrix/normalize.go
+    - internal/matrix/github.go
+    - internal/matrix/artifact.go
+    - internal/matrix/verify.go
+    - internal/matrix/compare.go
+    - scripts/smoke.sh
+    - dist/verify.json
+  blockers:
+    - live GitHub pin round-trip not yet recorded
+    - browser runtime smoke blocked by current Chromium/headless environment
+    - schema migration/version negotiation not yet implemented
+  last_verified: 2026-09-29
+  exit_gate: "A project can be ingested, pinned, rendered, exported, reopened, compared, and independently verified without hidden hosted state."
+phase_1:
+  status: partial
+  evidence:
+    - web/app-dir-matrix-core-v0.2.0.html
+  blockers:
+    - path/blast-radius/typed overlay query engine not implemented
+  last_verified: null
+  exit_gate: "Architecture questions are answerable from the map without repeatedly re-reading the repository."
+phase_2:
+  status: candidate
+  evidence:
+    - app_dir_matrix.ingest_ref_glob@1.0.0 embedded in v0.2.0 core
+  blockers:
+    - no local query server/MCP implementation
+  last_verified: null
+  exit_gate: "Two agents receive consistent scoped provenance-aware context."
+phase_3:
+  status: not_started
+  evidence: []
+  blockers: ["phase_0_and_2_contracts"]
+  last_verified: null
+  exit_gate: "Project explains what it knows, why, when current, and what changed."
+phase_4:
+  status: not_started
+  evidence: []
+  blockers: ["phase_3_persistence"]
+  last_verified: null
+  exit_gate: "Reusable knowledge creates safe project/scaffold structures with provenance."
+phase_5:
+  status: not_started
+  evidence: []
+  blockers: ["phase_2_ingest_api", "phase_4_ref_contracts"]
+  last_verified: null
+  exit_gate: "Browser-discovered references enter the correct project with provenance."
+phase_6:
+  status: not_started
+  evidence: []
+  blockers: ["phase_2_scopes", "phase_3_persistence"]
+  last_verified: null
+  exit_gate: "Long work is inspectable, bounded, recoverable, and has durable handoff evidence."
+phase_7:
+  status: not_started
+  evidence: []
+  blockers: ["phase_3_persistence", "phase_6_receipts"]
+  last_verified: null
+  exit_gate: "A team shares one durable project map and agent context."
+phase_8:
+  status: not_started
+  evidence: []
+  blockers: ["phase_4_scaffolds", "phase_7_trust_model"]
+  last_verified: null
+  exit_gate: "Domain context installs from packs while retaining source traceability and local control."
+phase_9:
+  status: not_started
+  evidence: []
+  blockers: ["phase_7_governance_base", "phase_8_signed_packs"]
+  last_verified: null
+  exit_gate: "Organizations can adopt without SaaS lock-in or routine product forks."

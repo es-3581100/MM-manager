@@ -1,0 +1,1002 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>App-Dir Matrix — Builder Plan + Implementation Prompt</title>
+<meta name="description" content="Hyperlinked builder prompt for planning and implementing the App-Dir Matrix roadmap with embedded Anti-AI design authority.">
+<style>
+:root{
+  --bg:#0d0f0c;--panel:#141713;--panel2:#191d18;--ink:#f0f2e9;--muted:#989f8d;
+  --line:#333a30;--hot:#c7ff5e;--warn:#f3c969;--bad:#ef7c72;--cyan:#55d6d0;
+  --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;
+  --sans:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;background:var(--bg);color:var(--ink)}
+body{margin:0;font-family:var(--sans);background:
+linear-gradient(rgba(255,255,255,.015) 1px,transparent 1px),
+linear-gradient(90deg,rgba(255,255,255,.012) 1px,transparent 1px),var(--bg);
+background-size:38px 38px,38px 38px,auto}
+a{color:inherit} code,pre,.mono{font-family:var(--mono)}
+.top{position:sticky;top:0;z-index:20;background:rgba(13,15,12,.95);backdrop-filter:blur(10px);
+border-bottom:1px solid var(--line);display:flex;gap:16px;align-items:center;padding:11px 18px}
+.brand{min-width:240px}.brand b{font:700 12px var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--hot)}
+.brand span{display:block;margin-top:3px;color:var(--muted);font:10px var(--mono)}
+.nav{display:flex;gap:5px;overflow:auto;flex:1}.nav a{text-decoration:none;white-space:nowrap;border:1px solid var(--line);
+padding:7px 9px;font:10px var(--mono);text-transform:uppercase;letter-spacing:.08em}
+.nav a:hover,.nav a:focus-visible{border-color:var(--hot);color:var(--hot);outline:none}
+.shell{width:min(1500px,calc(100% - 28px));margin:auto;padding:30px 0 70px}
+.hero{display:grid;grid-template-columns:1.2fr .8fr;gap:24px;border-bottom:1px solid var(--line);padding:24px 0 30px}
+.kicker{font:10px var(--mono);letter-spacing:.17em;text-transform:uppercase;color:var(--hot)}
+h1{font-size:clamp(44px,7vw,90px);line-height:.88;letter-spacing:-.055em;margin:10px 0 14px}
+.hero p{color:#c9cfc0;max-width:900px;font-size:18px;line-height:1.55}
+.manifest{border-left:3px solid var(--hot);padding:16px 18px;background:linear-gradient(90deg,rgba(199,255,94,.05),transparent)}
+.manifest b{font:700 11px var(--mono);letter-spacing:.12em;text-transform:uppercase}
+.manifest ul{padding-left:18px;color:#aeb5a4;line-height:1.6}
+.section{scroll-margin-top:80px;margin:42px 0}.section-head{display:grid;grid-template-columns:180px 1fr;gap:22px;margin-bottom:16px}
+.section-no{color:var(--hot);font:10px var(--mono);letter-spacing:.15em;text-transform:uppercase;padding-top:7px}
+h2{font-size:clamp(28px,4vw,50px);letter-spacing:-.04em;line-height:1;margin:0 0 9px}.lead{color:#aeb5a4;line-height:1.6}
+.rack{border-top:4px solid var(--hot);background:#13170e;box-shadow:inset 0 0 0 1px #2c3425}
+.rack-row{display:grid;grid-template-columns:64px 230px 1fr 180px;gap:12px;align-items:start;padding:12px;
+border-bottom:1px solid #30392a;font-size:12px}.rack-row:last-child{border-bottom:0}.rack-row b{color:var(--hot);font:11px var(--mono)}
+.rack-row strong{font-size:13px}.rack-row span{color:#aeb5a4;line-height:1.45}.cap{color:var(--warn)!important;font:10px var(--mono)}
+.prompt-wrap{border:1px solid var(--line);background:#10120f}.prompt-head{display:flex;justify-content:space-between;gap:12px;align-items:center;
+padding:11px 13px;border-bottom:1px solid var(--line);background:#171a16}.prompt-head b{font:11px var(--mono);color:var(--hot);letter-spacing:.1em}
+button,.btn{font:9px var(--mono);letter-spacing:.08em;text-transform:uppercase;color:#d8ddcf;background:#11130f;border:1px solid #464d41;padding:8px 10px;cursor:pointer}
+button:hover,.btn:hover{border-color:var(--hot);color:var(--hot)}
+pre{margin:0;padding:18px;white-space:pre-wrap;overflow:auto;font:11px/1.62 var(--mono);color:#c1c8b9;max-height:980px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.panel{border:1px solid var(--line);background:var(--panel);padding:17px}
+.panel h3{margin:0 0 10px;font-size:19px}.panel p,.panel li{color:#aeb5a4;line-height:1.55}.panel ul{padding-left:18px}
+.ref-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}.ref-actions a{text-decoration:none}
+.hash{font:10px var(--mono);color:#88917f;word-break:break-all;margin-top:9px}
+.gates{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}.gate{border:1px solid var(--line);background:#141713;padding:12px}
+.gate b{display:block;color:var(--hot);font:10px var(--mono);margin-bottom:5px}.gate span{font-size:12px;color:#aeb5a4}
+.note{border-left:3px solid var(--warn);padding:12px 14px;background:rgba(243,201,105,.035);color:#c9c5ac;line-height:1.55}
+details{border:1px solid var(--line);background:#11130f;margin-top:10px}summary{cursor:pointer;padding:12px 14px;font:11px var(--mono);color:var(--hot)}
+details .inside{padding:0 14px 14px;color:#aeb5a4;line-height:1.6}
+.footer{margin-top:45px;padding-top:18px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:18px;color:#7d8577;font:10px var(--mono)}
+@media(max-width:900px){.hero,.section-head,.grid2{grid-template-columns:1fr}.rack-row{grid-template-columns:50px 1fr}.rack-row span,.rack-row .cap{grid-column:2}.gates{grid-template-columns:1fr 1fr}.brand{min-width:0}.top{align-items:flex-start;flex-direction:column}.nav{width:100%}}
+@media(max-width:600px){.gates{grid-template-columns:1fr}h1{font-size:44px}.shell{width:min(100% - 18px,1500px)}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body id="top">
+<!-- LICENSING SUPERSESSION NOTICE: repository LICENSE and LEGAL.md control current rights posture. Earlier "open/free core" roadmap language in this preserved builder handoff describes product availability/portability and does not grant source-code rights. -->
+<header class="top">
+  <div class="brand"><b>APP-DIR MATRIX // BUILDER HANDOFF</b><span>plan → implement → verify → checkpoint</span></div>
+  <nav class="nav" aria-label="Hyper index">
+    <a href="#mission">Mission</a>
+    <a href="#phase-map">Phase Map</a>
+    <a href="#prompt">Builder Prompt</a>
+    <a href="#design-ref">Design Ref</a>
+    <a href="#validation">Validation</a>
+    <a href="#embedded">Embedded Sources</a>
+  </nav>
+</header>
+<div id="rightsSupersession" style="margin:10px 18px 0;padding:10px 12px;border:1px solid #f3c969;background:#19170f;color:#d9d1aa;font:11px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace"><b style="color:#f3c969">LICENSING SUPERSESSION:</b> This preserved builder handoff contains earlier roadmap wording such as “free/open core.” Current repository rights are governed by <code>LICENSE</code> and <code>LEGAL.md</code>: public visibility and no-cost product tiers do not grant source-code reuse, derivative-work, hosting, training, patent, trademark, or commercial/application rights.</div>
+
+<main class="shell">
+<section class="hero" id="mission">
+  <div>
+    <div class="kicker">Execution prompt · roadmap-aware · evidence-first</div>
+    <h1>Plan the whole system. Build only what the evidence earns.</h1>
+    <p>This handoff asks a builder agent to recover the current project, draft a complete dependency-aware Phase 0–9 plan, implement the earliest safe incomplete phase, verify it, checkpoint the evidence, and advance only through passed gates.</p>
+  </div>
+  <aside class="manifest">
+    <b>Builder posture</b>
+    <ul>
+      <li>Useful before large.</li>
+      <li>Evidence before claims.</li>
+      <li>Scope before autonomy.</li>
+      <li>Portable before hosted-only.</li>
+      <li>Design system before decoration.</li>
+      <li>Capability before monetization.</li>
+    </ul>
+  </aside>
+</section>
+
+<section class="section" id="phase-map">
+  <header class="section-head">
+    <div class="section-no">01 / Roadmap</div>
+    <div><h2>Dependency-aware phase map.</h2><p class="lead">The builder plans all phases up front, but implementation proceeds from the earliest incomplete unblocked phase. Capital streams activate only after the corresponding product capability is real.</p></div>
+  </header>
+  <div class="rack"><div class="rack-row"><b>P0</b><strong>Core Truth</strong><span>Reproducibility, typed evidence, packaging<br><em>Gate: Ingest → pin → render → export → reopen → compare → verify</em></span><span class="cap">Free/open core</span></div>
+<div class="rack-row"><b>P1</b><strong>Project Intelligence</strong><span>Paths, blast radius, overlays, working sets<br><em>Gate: Architecture questions answerable from the map</em></span><span class="cap">Community</span></div>
+<div class="rack-row"><b>P2</b><strong>Agent Context</strong><span>MCP/API, scoped exports, agent briefs<br><em>Gate: Two agents receive consistent provenance-aware context</em></span><span class="cap">Personal seam</span></div>
+<div class="rack-row"><b>P3</b><strong>Persistent Memory</strong><span>SQLite, wiki, claims/evidence, optional vector/QTable<br><em>Gate: System can explain what/why/when changed</em></span><span class="cap">Pro seam</span></div>
+<div class="rack-row"><b>P4</b><strong>Hyper-Index + Scaffolds</strong><span>Generated linked docs and project scaffolds<br><em>Gate: Reusable knowledge creates safe project structures</em></span><span class="cap">Pro</span></div>
+<div class="rack-row"><b>P5</b><strong>Browser Companion</strong><span>MV3 capture + light runtime + Go-App/WASM research<br><em>Gate: Browser refs enter project space with provenance</em></span><span class="cap">Acquisition / Pro convenience</span></div>
+<div class="rack-row"><b>P6</b><strong>Actor / Task Runtime</strong><span>Explicit states, scopes, receipts, handoffs<br><em>Gate: Long work is inspectable and recoverable</em></span><span class="cap">Pro / compute add-on</span></div>
+<div class="rack-row"><b>P7</b><strong>Team Environment</strong><span>Shared state, permissions, CI, review<br><em>Gate: Humans/agents share one durable project understanding</em></span><span class="cap">Team</span></div>
+<div class="rack-row"><b>P8</b><strong>Pack Ecosystem</strong><span>Open knowledge packs, registry, marketplace<br><em>Gate: Domain intelligence installs without losing provenance</em></span><span class="cap">Packs / marketplace</span></div>
+<div class="rack-row"><b>P9</b><strong>Enterprise</strong><span>SSO/RBAC, audit, air-gap, scale<br><em>Gate: Governed adoption without SaaS lock-in</em></span><span class="cap">Custom enterprise</span></div></div>
+</section>
+
+<section class="section" id="prompt">
+  <header class="section-head">
+    <div class="section-no">02 / Builder prompt</div>
+    <div><h2>Copy this into the implementation agent.</h2><p class="lead">The full prompt is intentionally explicit about recovery, planning artifacts, phase gates, evidence classes, design validation, stop conditions, verification, and final handoff.</p></div>
+  </header>
+  <div class="prompt-wrap">
+    <div class="prompt-head"><b>APP-DIR-MATRIX-BUILD.prompt.md</b><button id="copyPrompt" type="button">Copy prompt</button></div>
+    <pre id="promptText"># BUILD TASK — APP-DIR MATRIX: PLAN, IMPLEMENT, VERIFY
+
+## ROLE
+
+You are the primary senior implementation agent for App-Dir Matrix Core.
+
+Your job is not merely to brainstorm the product, rewrite the README, or produce an aspirational architecture.
+
+Your job is to:
+
+```text
+inspect current project truth
+→ recover existing work
+→ draft a dependency-aware master build plan
+→ identify the earliest incomplete/unblocked phase
+→ implement that phase in bounded increments
+→ verify the implementation
+→ checkpoint the evidence
+→ continue only when the phase exit gate is earned
+```
+
+The product is a local-first project intelligence and control layer for humans and AI agents.
+
+The graph is a view.
+The LLM is a client.
+The repository is a source.
+The durable product is the project model, its evidence, its state, and its portable interfaces.
+
+---
+
+## 1. SOURCE / AUTHORITY ORDER
+
+Use evidence in this order unless the repository explicitly establishes a stricter rule:
+
+1. Current repository/worktree and executable behavior.
+2. Current tests, schemas, manifests, generated artifacts, and verification records.
+3. The current App-Dir Matrix README / roadmap supplied with this build handoff.
+4. The App-Dir Matrix core contract and existing artifact behavior.
+5. The embedded Anti-AI Design Rules build reference for all UI/design work.
+6. Existing project decision records and documented invariants.
+7. External references only when they are necessary to resolve a concrete implementation question.
+
+Do not turn a README claim into an implementation fact.
+Do not turn a Git-tree relationship into a semantic/call relationship.
+Do not turn retrieval similarity into truth.
+Do not turn context into execution authority.
+Do not turn a planned capital stream into a currently implemented billing feature.
+
+When two sources disagree, stop the affected claim from advancing and record the discrepancy.
+
+---
+
+## 2. PRIMARY PRODUCT CONTRACT
+
+Preserve these principles through every phase:
+
+```text
+local-first by default
+open / portable core
+human + agent share the same project map
+evidence classes remain separate
+model/provider independence
+no authority inflation
+reproducible, hashable artifacts
+progressive complexity
+```
+
+The target system evolves from:
+
+```text
+sources / repos / docs / notes / reference packs
+                    ↓
+        normalized + provenance-aware ingest
+                    ↓
+       pinned structural project evidence
+                    ↓
+ semantic / runtime / ownership / test overlays
+                    ↓
+         shared human + agent project map
+                    ↓
+   scoped context / memory / tasks / actors
+                    ↓
+      history / evidence / reusable packs
+```
+
+Do not replace this model with a generic chat frontend, generic RAG wrapper, generic IDE clone, or opaque hosted-only agent platform.
+
+---
+
+## 3. FIRST ACTION — RECOVER, DO NOT REBUILD
+
+Before changing code:
+
+```text
+inspect
+→ inventory
+→ recover
+→ compare
+→ plan
+```
+
+Check, when present:
+
+- repository root and branch;
+- tracked, modified, untracked, staged, and ignored files relevant to the task;
+- existing README/roadmap;
+- package/module manifests;
+- current application entry points;
+- tests and fixtures;
+- build scripts;
+- generated artifacts;
+- existing plans, decisions, ledgers, checkpoints, or prior implementation reports;
+- existing App-Dir Matrix HTML/core artifacts;
+- current schema/manifest contracts;
+- any existing browser extension, MCP/API, SQLite, graph, or actor-runtime work.
+
+Do not regenerate substantial existing work merely because the current branch HEAD does not describe all work.
+
+Record a concise `BASELINE` block before implementation:
+
+```yaml
+baseline:
+  repository:
+  branch:
+  head:
+  dirty_state:
+  current_core_version:
+  tests_found:
+  existing_phase_status:
+  recovered_artifacts:
+  unresolved_discrepancies:
+```
+
+If the repository already has equivalent project-state files, update those instead of creating duplicate bookkeeping systems.
+
+---
+
+## 4. REQUIRED MASTER BUILD PLAN
+
+Draft a complete Phase 0 → Phase 9 plan before implementing new product scope.
+
+The plan must be implementation-shaped, not promotional prose.
+
+For every phase record:
+
+```yaml
+phase:
+  objective:
+  prerequisites:
+  current_evidence:
+  existing_implementation:
+  missing_work:
+  files_or_modules_likely_affected:
+  data_contracts:
+  migrations:
+  tests:
+  verification:
+  risks:
+  security_or_authority_boundaries:
+  design_surface:
+  deployment_target:
+  capital_stream_enabled_by_this_phase:
+  explicit_non_goals:
+  exit_gate:
+  status:
+```
+
+Use status values such as:
+
+```text
+implemented
+verified
+partial
+candidate
+planned
+blocked
+stale
+failed
+drifted
+not_started
+```
+
+Do not call a phase complete because files exist.
+
+A phase is complete only when its exit gate is supported by implementation + verification evidence.
+
+---
+
+## 5. PHASE ORDER
+
+### Phase 0 — Core Truth, Reproducibility, and Packaging
+
+Make the existing matrix dependable and reusable.
+
+Minimum scope:
+
+- stable/versioned project document/schema contract;
+- typed separation of structural, semantic, annotation, derived, and future runtime evidence;
+- deterministic build metadata and SHA-256 output;
+- status vocabulary;
+- regression fixtures for ref-glob normalization, branch resolution, recursive-tree truncation, subpath verification, and import/export;
+- snapshot/drift comparison;
+- offline HTML handoff;
+- consumable manifest/API contract.
+
+Exit gate:
+
+&gt; A project can be ingested, pinned, rendered, exported, reopened, compared, and independently verified without hidden hosted state.
+
+No paywall belongs in Phase 0.
+
+---
+
+### Phase 1 — Project Intelligence Map
+
+Move from tree browsing to project understanding.
+
+Plan and implement, in dependency order:
+
+- two-node path queries;
+- fan-in / fan-out / blast radius;
+- structural and semantic heatmaps;
+- typed edge filters;
+- Git-history overlays;
+- test overlays;
+- ownership/maintainer overlays;
+- authority/trust-boundary overlays;
+- deployment/runtime-boundary overlays;
+- bookmarks;
+- named node groups;
+- working sets;
+- saved views;
+- graph/radar/freeze-frame views;
+- proposed-vs-verified comparisons;
+- &quot;why is this connected?&quot; evidence inspection.
+
+Exit gate:
+
+&gt; A user can answer architecture questions from the map without repeatedly re-reading the repository.
+
+This remains primarily Community/basic_4_life.
+
+---
+
+### Phase 2 — Agent Context Server and Scoped Exports
+
+Turn the project model into a reliable context provider.
+
+Plan:
+
+- stable local API/MCP query surface;
+- task-scoped context export;
+- portable context capsules;
+- explicit scope metadata;
+- path / neighbor / dependency / ownership / test / provenance / docs / evidence queries;
+- JSON and YAML exports;
+- adapter-safe exports for QTable/hash-table/LangGraph/LangChain consumers without making those core dependencies;
+- multi-repository graphs;
+- deployment-chain views;
+- portable agent briefs;
+- optional headless CLI.
+
+Exit gate:
+
+&gt; Two different agents can consume the same project model and receive consistent scoped context with provenance.
+
+Earliest Personal-tier seam may appear here, but the open local format and basic query surface stay free.
+
+---
+
+### Phase 3 — Persistent Project Memory and Knowledge Layer
+
+Add durable knowledge that source trees alone cannot carry.
+
+Plan:
+
+- SQLite project store;
+- bookmarks/views/working sets/evidence/history;
+- wiki-like entity/concept/decision/reference indexing;
+- time-aware snapshots;
+- source freshness/drift;
+- claim → evidence records;
+- optional lightweight vector/Chroma adapter;
+- optional QTable storage for workflow/routing hints;
+- deterministic hashed indexes;
+- reference-pack versioning;
+- import/export bridges.
+
+Keep vector similarity and learned utility explicitly non-authoritative.
+
+Exit gate:
+
+&gt; The project can explain what it knows, why it knows it, when that evidence was current, and what changed.
+
+This phase can support a stronger Pro tier and optional hosted compute.
+
+---
+
+### Phase 4 — Hyper-Index and Scaffold Generation
+
+Turn verified project knowledge into reusable project construction.
+
+Plan:
+
+- human/agent hyper-index generation;
+- linked README / AGENT / architecture/reference artifacts;
+- scaffold generation from explicit templates;
+- template inheritance;
+- safe reference-pack import;
+- no silent propagation of secrets or execution authority;
+- Git-friendly generated output;
+- deterministic manifests/hashes;
+- regeneration without destroying user-authored material.
+
+Exit gate:
+
+&gt; A user can create a new project/scaffold from explicit reusable knowledge while retaining provenance and ownership boundaries.
+
+---
+
+### Phase 5 — Browser Companion and Lightweight Full Runtime
+
+Reduce friction between browser research and project state.
+
+Plan two related but separate deliverables.
+
+#### Companion Chrome/Chromium extension
+
+- Manifest V3;
+- minimal permissions;
+- explicit project selection;
+- capture selected URLs/text/reference metadata into an inbox or staging surface;
+- no broad page injection;
+- no credential/cookie/token collection;
+- provenance on every imported item;
+- clear local-first privacy behavior;
+- removable without damaging project data.
+
+#### Light full-extension runtime
+
+- allow browsing/searching project maps from the extension;
+- local project switching;
+- bookmarks and saved views;
+- scoped export;
+- use a localhost helper only for capabilities the browser sandbox cannot safely provide;
+- remain intentionally smaller than the full runtime.
+
+Also investigate Go-App/WASM/PWA deployment without making ordinary static HTML obsolete.
+
+Exit gate:
+
+&gt; A useful browser-discovered repository/document can be added to the correct project intelligence space with minimal friction and clear provenance.
+
+The extension should primarily be an acquisition/convenience surface, not a coercive paywall.
+
+---
+
+### Phase 6 — Actor / Task Runtime
+
+Move from passive knowledge to explicit stateful work.
+
+Plan:
+
+- explicit task/actor state machines;
+- allowed transitions;
+- task inputs/outputs/evidence;
+- model/provider identity when available;
+- completion/abort reason;
+- scope-bound workers;
+- durable receipts;
+- queue/pause/resume/review/failure states;
+- propose → review → approve → execute/emit patterns;
+- strict separation between descriptive knowledge and execution authority;
+- multi-agent handoff without scope widening;
+- bounded replay/inspection.
+
+Exit gate:
+
+&gt; Long-running or multi-step work has inspectable state, bounded scope, durable history, and explicit handoff evidence.
+
+---
+
+### Phase 7 — Team Project Operating Environment
+
+Add genuinely shared project state.
+
+Plan:
+
+- shared matrices/reference packs;
+- shared bookmarks/views/scopes;
+- human/agent handoff records;
+- read / annotate / propose / approve / administer / execute permissions where appropriate;
+- shared history;
+- CI rebuild/drift/semantic refresh;
+- review workflows;
+- signed/versioned snapshots;
+- concurrent-edit conflict handling;
+- self-hosted team deployment first.
+
+Exit gate:
+
+&gt; A team can share one project map and agent context without each person/model reconstructing project truth independently.
+
+Only here should Team pricing be treated as a real product capability rather than a roadmap idea.
+
+---
+
+### Phase 8 — Reference-Pack / Project-Pack Ecosystem
+
+Formalize reusable domain intelligence.
+
+Plan:
+
+- open pack format;
+- metadata;
+- compatibility;
+- provenance;
+- source pins;
+- hashes/signatures;
+- update channels;
+- trust levels;
+- composition/inheritance;
+- compatibility tests;
+- stale-source warnings;
+- community / official / private / vendor pack classes;
+- searchable registry/catalog.
+
+Packs may contain:
+
+```text
+references
+verified paths
+semantic maps
+docs
+search presets
+tests
+agent instructions
+workflow hints
+scaffolds
+```
+
+but must not silently acquire execution authority.
+
+Exit gate:
+
+&gt; A new project can gain high-quality domain context from a pack while preserving traceable sources and project-local control.
+
+Marketplace/paid pack work belongs here, not earlier.
+
+---
+
+### Phase 9 — Enterprise Governance and Large-Scale Deployment
+
+Plan:
+
+- SSO/RBAC;
+- organization policy/trust configuration;
+- signed provenance and attestation;
+- audit export/retention;
+- air-gapped deployment;
+- organization-hosted provider routing;
+- monorepo scaling;
+- controlled pack registry/update channels;
+- compliance-oriented evidence retention without claiming the product itself guarantees compliance;
+- support/SLA/controlled upgrades.
+
+Exit gate:
+
+&gt; An organization can adopt App-Dir Matrix without surrendering project knowledge to an external SaaS and without forking the product for ordinary governance needs.
+
+Enterprise is custom-priced because deployment/governance/support are the value, not proprietary file formats.
+
+---
+
+## 6. CAPITAL STREAM RULES
+
+Treat capital streams as capability-gated roadmap metadata.
+
+Do not implement billing merely because pricing is documented.
+
+The current intended ladder is:
+
+```text
+Community/basic_4_life  → Phase 0+
+Personal                 → earliest Phase 2
+Pro                      → earliest Phase 3
+Team                     → Phase 7
+Official/paid packs      → Phase 8
+Pack marketplace         → Phase 8
+Enterprise               → Phase 9
+Hosted compute add-ons   → only where real compute/service cost exists
+```
+
+Preserve for the free/open core:
+
+```text
+basic local HTML export
+basic repository indexing
+basic local search
+basic open project format
+basic MCP/query contract
+BYO model/provider support
+```
+
+Paid value should accumulate around persistence, scale, semantic computation, collaboration, history, automation, managed infrastructure, maintained packs, governance, and enterprise integration.
+
+---
+
+## 7. ANTI-AI DESIGN BUILD CONTRACT
+
+For every visual surface, use the embedded `Anti-AI Design Rules — Four-Pane Style Reference` as design authority.
+
+Do not merely imitate one example pane.
+
+Apply the underlying contract:
+
+```text
+palette identity
+spatial rhythm
+micro-interaction
+depth by structure
+```
+
+Required builder evidence:
+
+- name the design direction in concrete material language;
+- define reusable tokens before repeated one-off styling;
+- assign typography by job;
+- give semantic colors one meaning each;
+- compose the whole screen before decorating components;
+- design empty/loading/selected/disabled/warning/success states;
+- validate narrow + wide layouts;
+- respect keyboard focus and reduced motion.
+
+Use the canonical DON&#x27;T section in the embedded reference rather than inventing a second drifting prohibition list.
+
+Before expanding visual scope, pass:
+
+```text
+V1 identity
+V2 hierarchy
+V3 consistency
+V4 interaction
+V5 responsive resilience
+```
+
+If a design gate fails, fix the existing system before adding decoration.
+
+The interface should look composed for this product, not selected from a generic SaaS/AI starter.
+
+---
+
+## 8. IMPLEMENTATION STRATEGY
+
+After the master plan exists:
+
+1. Determine the earliest incomplete, unblocked phase.
+2. Reduce that phase into the smallest coherent implementation slice that advances its exit gate.
+3. Record assumptions before code.
+4. Implement the slice.
+5. Run focused tests.
+6. Run integration/regression tests relevant to touched boundaries.
+7. Inspect generated artifacts, not only compiler/test exit codes.
+8. Update phase status and evidence.
+9. Commit/checkpoint only if the environment and user instructions authorize it.
+10. Continue to the next slice or phase only if the current gate remains valid.
+
+You may complete multiple slices/phases in one run when evidence supports doing so.
+
+Never skip a failed gate just to reach a more impressive feature.
+
+---
+
+## 9. BUILD ARTIFACTS
+
+Use existing project conventions when available.
+
+If no equivalent artifacts exist, create or maintain:
+
+```text
+BUILD_PLAN.md
+PHASE_STATUS.yaml
+DECISIONS.md
+VERIFICATION.md
+IMPLEMENTATION_RESULT.md
+```
+
+### BUILD_PLAN.md
+
+Must contain:
+
+- baseline;
+- architecture decomposition;
+- Phase 0–9 dependency graph;
+- per-phase work packages;
+- interfaces/contracts;
+- migration strategy;
+- test strategy;
+- rollout/deployment strategy;
+- explicit non-goals;
+- design validation plan;
+- capital-stream activation gates;
+- next executable slice.
+
+### PHASE_STATUS.yaml
+
+Must be machine-readable and record:
+
+```yaml
+phase_0:
+  status:
+  evidence:
+  blockers:
+  last_verified:
+  exit_gate:
+```
+
+for every phase.
+
+### DECISIONS.md
+
+Record only decisions that future builders need to avoid rediscovery.
+
+Each decision should contain:
+
+```text
+context
+decision
+reason
+alternatives considered
+consequence
+evidence
+```
+
+### VERIFICATION.md
+
+Keep claims tied to commands, fixtures, artifacts, hashes, screenshots/runtime checks where appropriate, and exact pass/fail results.
+
+### IMPLEMENTATION_RESULT.md
+
+Summarize what changed in the current run without upgrading planned work into implemented work.
+
+---
+
+## 10. TEST / VERIFICATION LADDER
+
+Use the narrowest useful test first, then widen.
+
+Typical ladder:
+
+```text
+syntax / format
+→ unit
+→ focused contract tests
+→ integration
+→ artifact generation
+→ artifact inspection
+→ browser/runtime smoke
+→ regression
+→ packaging
+```
+
+For UI work:
+
+- test real long content;
+- test narrow and wide widths;
+- test keyboard focus;
+- test reduced-motion behavior;
+- test loading/empty/error/selected/disabled states;
+- inspect the actual rendered application when tooling allows.
+
+For ingest/evidence work:
+
+- test malformed URLs;
+- escaped Markdown URLs;
+- duplicate refs;
+- unknown branches;
+- moved/deleted subpaths;
+- truncated Git trees;
+- stale pins;
+- semantic edges that cannot resolve;
+- imported annotations that must remain annotations.
+
+For persistence:
+
+- schema create/migrate/reopen;
+- crash/interruption safety where relevant;
+- deterministic export/import;
+- provenance survival;
+- no authority escalation through persistence.
+
+For agent/runtime work:
+
+- scope enforcement;
+- state-transition validity;
+- interruption/recovery;
+- handoff;
+- abort;
+- stale-context handling;
+- no silent widening of permissions.
+
+---
+
+## 11. SAFETY / AUTHORITY BOUNDARIES
+
+Do not:
+
+- add a second hidden authority path because it is easier to implement;
+- treat a failed mock/local path as permission to fall back to a live/mutating path;
+- expose secrets in logs, generated artifacts, browser storage, or context capsules;
+- broaden browser permissions for convenience;
+- enable external deployment, billing, paid APIs, or hosted infrastructure without explicit authorization;
+- push/merge/release merely because local tests pass;
+- silently replace an open/local path with a hosted dependency;
+- couple the project model to one LLM provider;
+- fabricate semantic relationships from filenames;
+- label an inference `verified`;
+- label a build `production-ready` without evidence matching that claim.
+
+---
+
+## 12. STOP CONDITIONS
+
+Stop advancing the affected slice and report a concrete blocker when:
+
+- source truth is contradictory;
+- a required artifact is missing and cannot be recovered;
+- a recursive tree is truncated but completeness is required;
+- a migration could destroy user data without a verified recovery path;
+- tests reveal a boundary regression;
+- the design validation gate fails;
+- implementation requires a new authority/security surface not covered by the plan;
+- a paid/external service is required without user authorization;
+- the only way forward would be to discard existing work and rebuild from assumptions.
+
+Stopping a phase is not failure if the blocker is correctly identified and preserved.
+
+---
+
+## 13. FINAL REPORT
+
+At the end of the run, report:
+
+### Baseline
+What was present before modification.
+
+### Master plan
+Where the Phase 0–9 plan was written and the dependency ordering chosen.
+
+### Implemented
+Exact files/modules/features changed.
+
+### Verification
+Commands/tests/artifacts and their results.
+
+### Design
+Named visual direction, Anti-AI reference gates checked, and any remaining UI limitations.
+
+### Phase status
+For all phases, distinguish:
+
+```text
+verified
+implemented_not_fully_verified
+partial
+planned
+blocked
+not_started
+```
+
+### Capital status
+State which capital streams are merely planned and which, if any, now have actual product capability beneath them.
+
+### Deviations
+Anything intentionally different from this prompt and why.
+
+### Remaining blockers
+Concrete unresolved issues.
+
+### Next executable slice
+The smallest safe next piece of work.
+
+Do not finish with a vague “next steps” list.
+Leave a state another builder can resume without reconstructing the session.
+
+---
+
+## 14. GUIDING PRINCIPLE
+
+Build the smallest thing that makes the project model more trustworthy, useful, portable, and reusable.
+
+Then verify it.
+
+Then expand.
+
+```text
+useful before large
+evidence before claims
+scope before autonomy
+portable before hosted-only
+design system before decoration
+capability before monetization
+```
+</pre>
+  </div>
+</section>
+
+<section class="section" id="design-ref">
+  <header class="section-head">
+    <div class="section-no">03 / Build reference</div>
+    <div><h2>Anti-AI Design Rules are design authority.</h2><p class="lead">The reference is embedded in this handoff byte-for-byte. The builder should use its contract and validation gate for UI work rather than defaulting to generic SaaS/AI styling.</p></div>
+  </header>
+  <div class="grid2">
+    <article class="panel">
+      <h3>What the builder must carry forward</h3>
+      
+<ul>
+<li><b>Palette identity:</b> use a material/medium/operating-condition palette, not framework defaults.</li>
+<li><b>Spatial rhythm:</b> section spacing, component spacing, and dense instrumentation zones should have different jobs.</li>
+<li><b>Micro-interaction:</b> motion explains state; keep it local, restrained, keyboard-aware, and reduced-motion safe.</li>
+<li><b>Depth by structure:</b> prefer tonal planes, typography, spacing, texture, and selective boundaries over ornamental effects.</li>
+<li><b>Canonical DON'Ts:</b> keep the detailed prohibition list in the reference itself; do not create drifting copies.</li>
+</ul>
+
+      <div class="note"><b>No expansion without validation.</b> A new visual layer is not a substitute for fixing weak identity, hierarchy, consistency, interaction, or responsive resilience.</div>
+    </article>
+    <article class="panel">
+      <h3>Embedded original source</h3>
+      <p>Original filename: <code>anti-ai-design-rules-four-pane(2).html</code></p>
+      <div class="ref-actions">
+        <a class="btn" id="openAnti" href="#" target="_blank" rel="noopener">Open embedded design ref</a>
+        <a class="btn" id="saveAnti" href="#" download="anti-ai-design-rules-four-pane.html">Save embedded design ref</a>
+      </div>
+      <div class="hash">SHA-256: 944e1d2a4c0fd6711155f1ba63fcc13db1d0dbfb88ee1696799981a0636fdac4</div>
+      <details>
+        <summary>Why this is a build reference, not decoration</summary>
+        <div class="inside">The builder must name a visual direction, define reusable tokens, assign typography by job, preserve semantic color meaning, design all interaction states, and pass the reference's five-part validation gate before adding visual complexity.</div>
+      </details>
+    </article>
+  </div>
+</section>
+
+<section class="section" id="validation">
+  <header class="section-head">
+    <div class="section-no">04 / Validation</div>
+    <div><h2>Five UI gates plus one engineering rule.</h2><p class="lead">The visual gates come directly from the attached Anti-AI reference. The engineering rule mirrors the same principle: failed verification blocks expansion.</p></div>
+  </header>
+  <div class="gates">
+    <div class="gate"><b>V1 / IDENTITY</b><span>Visual idea is describable without “modern,” “clean,” or “AI.”</span></div>
+    <div class="gate"><b>V2 / HIERARCHY</b><span>Primary work, controls, metadata, and state read distinctly.</span></div>
+    <div class="gate"><b>V3 / CONSISTENCY</b><span>Repeated type, color, geometry, and spacing retain meaning.</span></div>
+    <div class="gate"><b>V4 / INTERACTION</b><span>Hover, focus, press, disabled, and reduced-motion states work deliberately.</span></div>
+    <div class="gate"><b>V5 / RESILIENCE</b><span>Real long content and narrow/wide layouts remain usable.</span></div>
+  </div>
+  <div class="note" style="margin-top:12px"><b>Engineering mirror:</b> no next-phase expansion while the current phase exit gate is unsupported, failed, or contradicted by source truth.</div>
+</section>
+
+<section class="section" id="embedded">
+  <header class="section-head">
+    <div class="section-no">05 / Embedded sources</div>
+    <div><h2>Portable handoff provenance.</h2><p class="lead">Both the roadmap used to draft the prompt and the original design reference are embedded so this single HTML can travel between agents without losing the governing documents.</p></div>
+  </header>
+  <div class="grid2">
+    <article class="panel">
+      <h3>App-Dir Matrix README / roadmap</h3>
+      <p>Embedded from <code>APP-DIR-MATRIX-README.md</code>.</p>
+      <div class="ref-actions">
+        <a class="btn" id="openReadme" href="#" target="_blank" rel="noopener">Open embedded README</a>
+        <a class="btn" id="saveReadme" href="#" download="APP-DIR-MATRIX-README.md">Save embedded README</a>
+      </div>
+      <div class="hash">SHA-256: 873d02e7c4608fdda8e5b9803c104cceefa96321eafb5a87282be1384356e864</div>
+    </article>
+    <article class="panel">
+      <h3>Anti-AI Design Rules</h3>
+      <p>Embedded original HTML used as the canonical UI/build reference.</p>
+      <div class="hash">SHA-256: 944e1d2a4c0fd6711155f1ba63fcc13db1d0dbfb88ee1696799981a0636fdac4</div>
+      <p class="lead">The prompt intentionally references the source instead of duplicating its entire canonical DON'T list, preserving the reference's anti-drift rule.</p>
+    </article>
+  </div>
