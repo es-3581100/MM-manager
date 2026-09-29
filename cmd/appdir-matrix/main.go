@@ -63,9 +63,7 @@ func cmdBuild(args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Printf("built %s
-sha256 %s
-", *out, h)
+	fmt.Printf("built %s\nsha256 %s\n", *out, h)
 	return nil
 }
 
@@ -135,8 +133,7 @@ func cmdNormalize(args []string) error {
 	r := matrix.NormalizeRefGlob(string(b))
 	j, _ := json.MarshalIndent(r, "", "  ")
 	if *out != "" {
-		return os.WriteFile(*out, append(j, '
-'), 0o644)
+		return os.WriteFile(*out, append(j, '\n'), 0o644)
 	}
 	fmt.Println(string(j))
 	return nil
@@ -195,6 +192,5 @@ func cmdPin(args []string) error {
 	if err != nil {
 		return err
 	}
-	return os.WriteFile(*out, append(j, '
-'), 0o644)
+	return os.WriteFile(*out, append(j, '\n'), 0o644)
 }
