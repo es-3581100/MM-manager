@@ -24,7 +24,7 @@ appdir-matrix compare --left before.json --right after.json
 
 ## Current boundary
 
-This is a Phase 0 proof slice. It does not yet claim the complete Phase 0 exit gate because live GitHub resolution has not been exercised in this checkpoint, schema migration/version negotiation is not implemented, browser runtime smoke is environment-blocked, and the existing UI still owns its own JS rendering/export behavior.
+This is a Phase 0 proof slice. The real GitHub resolution path is now exercised through a captured public API session and deterministic offline replay. It still does not claim the complete Phase 0 exit gate because schema migration/version negotiation is not implemented, browser runtime smoke is environment-blocked, and the existing UI still owns its own JS rendering/export behavior.
 
 ## Captured real GitHub replay
 
