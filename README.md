@@ -35,6 +35,25 @@ sources / repos / docs / notes / reference packs
 
 The durable value is the **project model around the model**: what exists, how it is connected, why the system believes a relationship, what changed, what is currently in scope, and what an agent is allowed to treat as evidence.
 
+## Architecture Direction — Semantic Runtime + Matrix Observatory
+
+The project is now heading toward a provenance-first semantic object/tier runtime with the Matrix as its human/agent observatory.
+
+```text
+project/repository evidence
+  → SemanticDescriptor/v1
+  → PredictionReceipt/v1
+  → AdmissionDecision/v1
+  → TierEvent/v1
+  → Outcome/v1
+  → RuntimeTrace/v1
+  → Matrix observatory
+```
+
+The repository/project graph remains an evidence producer, not movement authority. Structural tree membership does not imply semantic dependency; mutability/recomputability remain unknown until evidenced; runtime traces are read-only evidence and never execution permission.
+
+Phase Zero.2 adds the first contract bridge from `app-dir-matrix.project/v1` into this runtime vocabulary. The tested Kotlin fairness harness produces machine-readable runtime traces while preserving the repaired Phase Zero.1 policy results byte-for-byte.
+
 ## Core Principles
 
 - **Local-first by default.** A useful project should not require a hosted control plane.

@@ -380,4 +380,14 @@ Community remains Phase 0+. Personal cannot activate before a useful scoped cont
 
 ## Next executable slice
 
-The real-source capture/replay slice is complete. Next, implement explicit `app-dir-matrix.project/v1` schema-version negotiation and a bounded migration framework that can reject unsupported future versions without guessing, preserve source provenance through migrations, and prove migrate → build → reopen/verify with fixtures. Phase 1 expansion remains blocked until Phase 0 migration semantics are verified and the browser runtime smoke is recorded in a healthy browser environment.
+Phase Zero.2 semantic runtime contracts are now established and regression-verified. Next, make the Matrix ingest `memory-matrix.runtime-trace/v1` as a read-only observatory overlay: object/tier state, prediction → admission → outcome trail, queue pressure, evidence source, and policy accounting. Do not add predictor sophistication or let runtime evidence become execution authority before this observability path is proven. Project schema migration/version negotiation and browser runtime smoke remain Phase 0 blockers.
+
+## Direction pivot — Phase Zero.2
+
+The project architecture now separates three durable planes:
+
+- **Go evidence/package plane:** ingest, normalize, pin, verify, replay, drift, portable project truth.
+- **Semantic runtime/policy plane:** descriptor → prediction receipt → admission → tier event → outcome.
+- **Matrix observatory plane:** human/agent visualization and query over structural evidence plus read-only runtime traces.
+
+The Q-table or any learned policy belongs behind the prediction/admission boundary. It may propose utility; it does not become factual truth or execution authority.

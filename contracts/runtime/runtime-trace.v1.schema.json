@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mm-manager.local/contracts/runtime-trace.v1.schema.json",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "runtime_version",
+    "policy",
+    "prediction_receipts",
+    "admission_decisions",
+    "tier_events",
+    "outcomes",
+    "metrics"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "memory-matrix.runtime-trace/v1"
+    },
+    "runtime_version": {
+      "type": "string"
+    },
+    "policy": {
+      "type": "string"
+    },
+    "prediction_receipts": {
+      "type": "array"
+    },
+    "admission_decisions": {
+      "type": "array"
+    },
+    "tier_events": {
+      "type": "array"
+    },
+    "outcomes": {
+      "type": "array"
+    },
+    "metrics": {
+      "type": "object"
+    }
+  },
+  "additionalProperties": false
+}

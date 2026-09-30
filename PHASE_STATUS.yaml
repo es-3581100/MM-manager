@@ -1,5 +1,5 @@
 schema: app-dir-matrix.phase-status/v1
-updated: 2026-09-29
+updated: 2026-09-30
 phase_0:
   status: partial
   evidence:
@@ -18,6 +18,15 @@ phase_0:
     - fixtures/github-live/octocat/Hello-World/tree-master.json
     - dist/github-live-replay/verify.json
     - dist/verify.json
+    - docs/PHASE0.2-SEMANTIC-RUNTIME.md
+    - contracts/runtime/semantic-descriptor.v1.schema.json
+    - contracts/runtime/prediction-receipt.v1.schema.json
+    - contracts/runtime/admission-decision.v1.schema.json
+    - contracts/runtime/tier-event.v1.schema.json
+    - contracts/runtime/outcome.v1.schema.json
+    - contracts/runtime/runtime-trace.v1.schema.json
+    - runtime/semantic-tier-phase-zero-2/project-to-semantic.go
+    - runtime/semantic-tier-phase-zero-2/CONTRACT_INTEGRATION_RESULT.md
   blockers:
     - browser runtime smoke blocked by current Chromium/headless environment
     - schema migration/version negotiation not yet implemented

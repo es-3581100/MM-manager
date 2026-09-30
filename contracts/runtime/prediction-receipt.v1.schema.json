@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mm-manager.local/contracts/prediction-receipt.v1.schema.json",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "prediction_id",
+    "object_id",
+    "issued_at_nanos",
+    "predicted_use_nanos",
+    "confidence",
+    "source",
+    "estimated_read_cost_nanos",
+    "estimated_waste_cost_nanos",
+    "evidence"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "memory-matrix.prediction-receipt/v1"
+    },
+    "prediction_id": {
+      "type": "string"
+    },
+    "object_id": {
+      "type": "string"
+    },
+    "issued_at_nanos": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "predicted_use_nanos": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "confidence": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1
+    },
+    "source": {
+      "enum": [
+        "ACTOR_EVENT",
+        "STRUCTURAL_GRAPH",
+        "HISTORY",
+        "CONFIGURED_POLICY",
+        "ORACLE"
+      ]
+    },
+    "estimated_read_cost_nanos": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "estimated_waste_cost_nanos": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "evidence": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    }
+  },
+  "additionalProperties": false
+}

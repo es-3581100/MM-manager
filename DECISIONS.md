@@ -95,3 +95,22 @@
 **Consequence:** Real-source evidence is durable and deterministic, but capture freshness remains explicit rather than pretending an old fixture is current live truth.
 
 **Evidence:** `fixtures/github-live/capture.json`, `TestCapturedGitHubFixtureReplaysOffline`, `TestGitHubFixtureHasNoNetworkFallback`, `TestGitHubFixtureRejectsTamperedResponse`, `scripts/github-live-replay.sh`.
+
+
+## D-008 — Matrix becomes the observatory for a semantic runtime
+
+**Context:** The owner-provided Phase Zero.1 semantic-tier runtime demonstrated a stronger separation than the repository-only roadmap: evidence, prediction receipts, admission, scheduling/tier movement, and outcomes can be modeled independently and audited.
+
+**Decision:** Treat MM-manager as three cooperating planes: Go evidence/package truth, semantic runtime/policy contracts, and the Matrix observatory. The Matrix is not itself the movement policy and runtime traces are not commands.
+
+**Reason:** This preserves structural/provenance truth while allowing multiple predictors, admission policies, Q-table experiments, and storage tiers to evolve behind stable contracts.
+
+**Boundary:** Structural path adjacency never creates a semantic dependency by itself. Imported mutability/recomputability stay UNKNOWN until explicitly evidenced. All imported evidence remains `authority: none`.
+
+**Evidence:** `docs/PHASE0.2-SEMANTIC-RUNTIME.md`, `contracts/runtime/`, `runtime/semantic-tier-phase-zero-2/project-to-semantic.go`.
+
+## D-009 — Configured policy evidence is distinct from observed actor events
+
+**Decision:** Static warmsets and declared semantic rules use `CONFIGURED_POLICY`; `ACTOR_EVENT` is reserved for actually observed actor/workflow events.
+
+**Reason:** A configuration statement and an observation have different provenance and must not be conflated.
