@@ -13,51 +13,30 @@
     "provenance"
   ],
   "properties": {
-    "schema_version": {
-      "const": "memory-matrix.semantic-descriptor/v1"
-    },
-    "object_id": {
-      "type": "string",
-      "minLength": 1
-    },
-    "kind": {
-      "type": "string",
-      "minLength": 1
-    },
-    "dependencies": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      },
-      "uniqueItems": true
-    },
-    "mutability": {
-      "enum": [
-        "UNKNOWN",
-        "MUTABLE",
-        "READ_MOSTLY",
-        "IMMUTABLE"
-      ]
-    },
-    "recomputability": {
-      "enum": [
-        "UNKNOWN",
-        "YES",
-        "NO"
-      ]
-    },
-    "confidence": {
-      "type": "number",
-      "minimum": 0,
-      "maximum": 1
-    },
-    "provenance": {
-      "type": "array",
-      "minItems": 1,
-      "items": {
-        "type": "object"
-      }
-    }
+    "schema_version": {"const": "memory-matrix.semantic-descriptor/v1"},
+    "object_id": {"type": "string", "minLength": 1},
+    "kind": {"type": "string", "minLength": 1},
+    "dependencies": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "mutability": {"enum": ["UNKNOWN", "MUTABLE", "READ_MOSTLY", "IMMUTABLE"]},
+    "recomputability": {"enum": ["UNKNOWN", "YES", "NO"]},
+    "confidence": {"type": "number", "minimum": 0, "maximum": 1},
+    "provenance": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/provenance"}}
   },
-  "additionalProperties": false
+  "additionalProperties": false,
+  "$defs": {
+    "provenance": {
+      "type": "object",
+      "required": ["producer", "semantic_type", "source", "observed_at_nanos", "detail", "authority"],
+      "properties": {
+        "producer": {"type": "string", "minLength": 1},
+        "semantic_type": {"enum": ["OBJECT", "PROGRAM", "WORKFLOW", "PREDICTIVE"]},
+        "source": {"enum": ["ACTOR_EVENT", "STRUCTURAL_GRAPH", "HISTORY", "CONFIGURED_POLICY", "ORACLE"]},
+        "observed_at_nanos": {"type": "integer", "minimum": 0},
+        "detail": {"type": "string"},
+        "authority": {"const": "none"},
+        "source_locator": {"type": ["string", "null"]}
+      },
+      "additionalProperties": false
+    }
+  }
 }

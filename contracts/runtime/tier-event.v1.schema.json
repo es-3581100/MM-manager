@@ -2,125 +2,28 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://mm-manager.local/contracts/tier-event.v1.schema.json",
   "type": "object",
-  "required": [
-    "schema_version",
-    "scheduled_at_nanos",
-    "actual_at_nanos",
-    "policy",
-    "actor",
-    "phase",
-    "event",
-    "object_id",
-    "prediction_id",
-    "evidence_sources",
-    "score",
-    "decision",
-    "reason",
-    "bytes",
-    "predicted_use_nanos",
-    "completion_nanos",
-    "expected_benefit_nanos",
-    "expected_cost_nanos",
-    "outstanding_prefetch_bytes",
-    "queue_depth"
-  ],
+  "required": ["schema_version", "scheduled_at_nanos", "actual_at_nanos", "policy", "actor", "phase", "event", "object_id", "prediction_id", "evidence_sources", "score", "decision", "reason", "bytes", "predicted_use_nanos", "completion_nanos", "expected_benefit_nanos", "expected_cost_nanos", "outstanding_prefetch_bytes", "queue_depth"],
   "properties": {
-    "schema_version": {
-      "const": "memory-matrix.tier-event/v1"
-    },
-    "scheduled_at_nanos": {
-      "type": "integer",
-      "minimum": 0
-    },
-    "actual_at_nanos": {
-      "type": "integer",
-      "minimum": 0
-    },
-    "policy": {
-      "type": "string"
-    },
-    "actor": {
-      "type": "string"
-    },
-    "phase": {
-      "type": "string"
-    },
-    "event": {
-      "type": "string"
-    },
-    "object_id": {
-      "type": [
-        "string",
-        "null"
-      ]
-    },
-    "prediction_id": {
-      "type": [
-        "string",
-        "null"
-      ]
-    },
-    "evidence_sources": {
-      "type": "array",
-      "items": {
-        "enum": [
-          "ACTOR_EVENT",
-          "STRUCTURAL_GRAPH",
-          "HISTORY",
-          "CONFIGURED_POLICY",
-          "ORACLE"
-        ]
-      },
-      "uniqueItems": true
-    },
-    "score": {
-      "type": [
-        "number",
-        "null"
-      ]
-    },
-    "decision": {
-      "type": "string"
-    },
-    "reason": {
-      "type": "string"
-    },
-    "bytes": {
-      "type": "integer",
-      "minimum": 0
-    },
-    "predicted_use_nanos": {
-      "type": [
-        "integer",
-        "null"
-      ]
-    },
-    "completion_nanos": {
-      "type": [
-        "integer",
-        "null"
-      ]
-    },
-    "expected_benefit_nanos": {
-      "type": [
-        "integer",
-        "null"
-      ]
-    },
-    "expected_cost_nanos": {
-      "type": [
-        "integer",
-        "null"
-      ]
-    },
-    "outstanding_prefetch_bytes": {
-      "type": "integer",
-      "minimum": 0
-    },
-    "queue_depth": {
-      "type": "integer",
-      "minimum": 0
-    }
+    "schema_version": {"const": "memory-matrix.tier-event/v1"},
+    "scheduled_at_nanos": {"type": "integer", "minimum": 0},
+    "actual_at_nanos": {"type": "integer", "minimum": 0},
+    "policy": {"type": "string"},
+    "actor": {"type": "string"},
+    "phase": {"type": "string"},
+    "event": {"type": "string"},
+    "object_id": {"type": ["string", "null"]},
+    "prediction_id": {"type": ["string", "null"]},
+    "evidence_sources": {"type": "array", "items": {"enum": ["ACTOR_EVENT", "STRUCTURAL_GRAPH", "HISTORY", "CONFIGURED_POLICY", "ORACLE"]}, "uniqueItems": true},
+    "score": {"type": ["number", "null"]},
+    "decision": {"type": "string"},
+    "reason": {"type": "string"},
+    "bytes": {"type": "integer", "minimum": 0},
+    "predicted_use_nanos": {"type": ["integer", "null"], "minimum": 0},
+    "completion_nanos": {"type": ["integer", "null"], "minimum": 0},
+    "expected_benefit_nanos": {"type": ["integer", "null"], "minimum": 0},
+    "expected_cost_nanos": {"type": ["integer", "null"], "minimum": 0},
+    "outstanding_prefetch_bytes": {"type": "integer", "minimum": 0},
+    "queue_depth": {"type": "integer", "minimum": 0}
   },
   "additionalProperties": false
 }

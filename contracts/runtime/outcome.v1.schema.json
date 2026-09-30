@@ -2,46 +2,14 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://mm-manager.local/contracts/outcome.v1.schema.json",
   "type": "object",
-  "required": [
-    "schema_version",
-    "prediction_id",
-    "object_id",
-    "outcome",
-    "at_nanos",
-    "reason"
-  ],
+  "required": ["schema_version", "prediction_id", "object_id", "outcome", "at_nanos", "reason"],
   "properties": {
-    "schema_version": {
-      "const": "memory-matrix.outcome/v1"
-    },
-    "prediction_id": {
-      "type": [
-        "string",
-        "null"
-      ]
-    },
-    "object_id": {
-      "type": [
-        "string",
-        "null"
-      ]
-    },
-    "outcome": {
-      "enum": [
-        "HIT",
-        "LATE",
-        "UNUSED",
-        "REJECTED",
-        "PROMOTED_TO_DEMAND"
-      ]
-    },
-    "at_nanos": {
-      "type": "integer",
-      "minimum": 0
-    },
-    "reason": {
-      "type": "string"
-    }
+    "schema_version": {"const": "memory-matrix.outcome/v1"},
+    "prediction_id": {"type": ["string", "null"]},
+    "object_id": {"type": ["string", "null"]},
+    "outcome": {"enum": ["HIT", "LATE", "UNUSED", "REJECTED", "PROMOTED_TO_DEMAND"]},
+    "at_nanos": {"type": "integer", "minimum": 0},
+    "reason": {"type": "string"}
   },
   "additionalProperties": false
 }
