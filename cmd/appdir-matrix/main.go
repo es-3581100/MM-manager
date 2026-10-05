@@ -29,6 +29,8 @@ func main() {
 		err = cmdNormalize(os.Args[2:])
 	case "pin":
 		err = cmdPin(os.Args[2:])
+	case "agent":
+		err = cmdAgent(os.Args[2:])
 	default:
 		usage()
 		os.Exit(2)
@@ -39,7 +41,10 @@ func main() {
 	}
 }
 
-func usage() { fmt.Fprintln(os.Stderr, "appdir-matrix <normalize|pin|build|verify|compare> [flags]") }
+func usage() {
+	fmt.Fprintln(os.Stderr, "appdir-matrix <normalize|pin|build|verify|compare|agent> [flags]")
+	fmt.Fprintln(os.Stderr, "appdir-matrix agent <bootstrap|resolve|inspect|expand|scope|verify-receipt> [flags]")
+}
 
 func cmdBuild(args []string) error {
 	fs := flag.NewFlagSet("build", flag.ContinueOnError)
@@ -87,9 +92,7 @@ func cmdVerify(args []string) error {
 		}
 		r.Checks = append(r.Checks, "sha256 sidecar matches artifact")
 	}
-	b, _ := json.MarshalIndent(r, "", "  ")
-	fmt.Println(string(b))
-	return nil
+	return printJSON(r)
 }
 
 func cmdCompare(args []string) error {
@@ -110,10 +113,7 @@ func cmdCompare(args []string) error {
 	if err != nil {
 		return err
 	}
-	r := matrix.CompareProjects(a, b)
-	out, _ := json.MarshalIndent(r, "", "  ")
-	fmt.Println(string(out))
-	return nil
+	return printJSON(matrix.CompareProjects(a, b))
 }
 
 func cmdNormalize(args []string) error {
@@ -193,4 +193,162 @@ func cmdPin(args []string) error {
 		return err
 	}
 	return os.WriteFile(*out, append(j, '\n'), 0o644)
+}
+
+func cmdAgent(args []string) error {
+	if len(args) < 1 {
+		return fmt.Errorf("agent subcommand is required")
+	}
+	switch args[0] {
+	case "bootstrap":
+		return cmdAgentBootstrap(args[1:])
+	case "resolve":
+		return cmdAgentResolve(args[1:])
+	case "inspect":
+		return cmdAgentInspect(args[1:])
+	case "expand":
+		return cmdAgentExpand(args[1:])
+	case "scope":
+		return cmdAgentScope(args[1:])
+	case "verify-receipt":
+		return cmdAgentVerifyReceipt(args[1:])
+	default:
+		return fmt.Errorf("unknown agent subcommand %q", args[0])
+	}
+}
+
+func cmdAgentBootstrap(args []string) error {
+	fs := flag.NewFlagSet("agent bootstrap", flag.ContinueOnError)
+	project := fs.String("project", "", "project JSON")
+	if err := fs.Parse(args); err != nil {
+		return err
+	}
+	idx, err := loadAgentIndex(*project)
+	if err != nil {
+		return err
+	}
+	return printJSON(idx.Bootstrap())
+}
+
+func cmdAgentResolve(args []string) error {
+	fs := flag.NewFlagSet("agent resolve", flag.ContinueOnError)
+	project := fs.String("project", "", "project JSON")
+	query := fs.String("query", "", "query text")
+	limit := fs.Int("limit", 8, "maximum results (1-32)")
+	if err := fs.Parse(args); err != nil {
+		return err
+	}
+	idx, err := loadAgentIndex(*project)
+	if err != nil {
+		return err
+	}
+	result, err := idx.Resolve(*query, *limit)
+	if err != nil {
+		return err
+	}
+	return printJSON(result)
+}
+
+func cmdAgentInspect(args []string) error {
+	fs := flag.NewFlagSet("agent inspect", flag.ContinueOnError)
+	project := fs.String("project", "", "project JSON")
+	pointer := fs.String("pointer", "", "exact node pointer")
+	if err := fs.Parse(args); err != nil {
+		return err
+	}
+	if *pointer == "" {
+		return fmt.Errorf("--pointer is required")
+	}
+	idx, err := loadAgentIndex(*project)
+	if err != nil {
+		return err
+	}
+	result, err := idx.Inspect(*pointer)
+	if err != nil {
+		return err
+	}
+	return printJSON(result)
+}
+
+func cmdAgentExpand(args []string) error {
+	fs := flag.NewFlagSet("agent expand", flag.ContinueOnError)
+	project := fs.String("project", "", "project JSON")
+	pointer := fs.String("pointer", "", "exact node pointer")
+	depth := fs.Int("depth", 1, "structural expansion depth (1-2)")
+	limit := fs.Int("limit", 8, "maximum nodes (1-32)")
+	if err := fs.Parse(args); err != nil {
+		return err
+	}
+	if *pointer == "" {
+		return fmt.Errorf("--pointer is required")
+	}
+	idx, err := loadAgentIndex(*project)
+	if err != nil {
+		return err
+	}
+	result, err := idx.Expand(*pointer, *depth, *limit)
+	if err != nil {
+		return err
+	}
+	return printJSON(result)
+}
+
+func cmdAgentScope(args []string) error {
+	fs := flag.NewFlagSet("agent scope", flag.ContinueOnError)
+	project := fs.String("project", "", "project JSON")
+	query := fs.String("query", "", "task/query text")
+	limit := fs.Int("limit", 12, "maximum included nodes (1-32)")
+	if err := fs.Parse(args); err != nil {
+		return err
+	}
+	idx, err := loadAgentIndex(*project)
+	if err != nil {
+		return err
+	}
+	result, err := idx.Scope(*query, *limit)
+	if err != nil {
+		return err
+	}
+	return printJSON(result)
+}
+
+func cmdAgentVerifyReceipt(args []string) error {
+	fs := flag.NewFlagSet("agent verify-receipt", flag.ContinueOnError)
+	project := fs.String("project", "", "project JSON")
+	receiptPath := fs.String("receipt", "", "retrieval receipt JSON")
+	if err := fs.Parse(args); err != nil {
+		return err
+	}
+	if *receiptPath == "" {
+		return fmt.Errorf("--receipt is required")
+	}
+	idx, err := loadAgentIndex(*project)
+	if err != nil {
+		return err
+	}
+	receipt, err := matrix.LoadRetrievalReceipt(*receiptPath)
+	if err != nil {
+		return err
+	}
+	result, err := idx.VerifyReceipt(receipt)
+	if err != nil {
+		return err
+	}
+	return printJSON(result)
+}
+
+func loadAgentIndex(project string) (*matrix.AgentIndex, error) {
+	if project == "" {
+		return nil, fmt.Errorf("--project is required")
+	}
+	return matrix.NewAgentIndex(project)
+}
+
+func printJSON(v any) error {
+	b, err := json.MarshalIndent(v, "", "  ")
+	if err != nil {
+		return err
+	}
+	fmt.Println(string(b))
+	return nil
 }
