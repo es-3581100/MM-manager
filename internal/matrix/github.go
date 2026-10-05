@@ -141,6 +141,6 @@ func (g GitHubResolver) getJSON(ctx context.Context, path string, out any) error
 }
 
 func safeID(s string) string {
-	r := strings.NewReplacer("/", "-", "\", "-", " ", "-", ".", "-")
+	r := strings.NewReplacer("/", "-", "\\", "-", " ", "-", ".", "-")
 	return strings.ToLower(r.Replace(s))
 }
