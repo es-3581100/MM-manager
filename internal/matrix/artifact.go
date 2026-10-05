@@ -103,17 +103,12 @@ func BuildArtifact(templatePath string, project Project) ([]byte, error) {
 		return nil, fmt.Errorf("template missing empty embeddedSnapshot marker")
 	}
 	newSnapshot := `<script id="embeddedSnapshot" type="application/json">` + string(snapJSON) + `</script>` +
-		"
-" + `<script id="embeddedProjectDocument" type="application/json">` + string(projectJSON) + `</script>`
+		"\n" + `<script id="embeddedProjectDocument" type="application/json">` + string(projectJSON) + `</script>`
 	text = strings.Replace(text, oldSnapshot, newSnapshot, 1)
 
-	header := fmt.Sprintf("<!-- APP-DIR-MATRIX GENERATED ARTIFACT | schema=%s | project=%s | build=%s | reproducible=true | Copyright © 2026 es-3581100 | ALL RIGHTS RESERVED | See repository LICENSE and LEGAL.md -->
-", project.SchemaVersion, project.ProjectID, project.Build.ID)
-	if strings.HasPrefix(text, "<!doctype html>
-") {
-		text = strings.Replace(text, "<!doctype html>
-", "<!doctype html>
-"+header, 1)
+	header := fmt.Sprintf("<!-- APP-DIR-MATRIX GENERATED ARTIFACT | schema=%s | project=%s | build=%s | reproducible=true | Copyright © 2026 es-3581100 | ALL RIGHTS RESERVED | See repository LICENSE and LEGAL.md -->\n", project.SchemaVersion, project.ProjectID, project.Build.ID)
+	if strings.HasPrefix(text, "<!doctype html>\n") {
+		text = strings.Replace(text, "<!doctype html>\n", "<!doctype html>\n"+header, 1)
 	} else {
 		text = header + text
 	}
@@ -126,8 +121,7 @@ func replaceJSConstLine(text, name, value string) (string, bool) {
 	if start < 0 {
 		return text, false
 	}
-	lineEnd := strings.IndexByte(text[start:], '
-')
+	lineEnd := strings.IndexByte(text[start:], '\n')
 	if lineEnd < 0 {
 		lineEnd = len(text) - start
 	}
@@ -145,15 +139,14 @@ func WriteArtifact(templatePath string, project Project, outPath string) (string
 		return "", err
 	}
 	hash := SHA256Bytes(b)
-	if err := os.WriteFile(outPath+".sha256", []byte(hash+"  "+baseName(outPath)+"
-"), 0o644); err != nil {
+	if err := os.WriteFile(outPath+".sha256", []byte(hash+"  "+baseName(outPath)+"\n"), 0o644); err != nil {
 		return "", err
 	}
 	return hash, nil
 }
 
 func baseName(path string) string {
-	if i := strings.LastIndexAny(path, "/\"); i >= 0 {
+	if i := strings.LastIndexAny(path, "/\\"); i >= 0 {
 		return path[i+1:]
 	}
 	return path
