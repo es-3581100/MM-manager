@@ -1,0 +1,27 @@
+name: phase2-agent-context
+
+on:
+  pull_request:
+    paths:
+      - "cmd/appdir-matrix/**"
+      - "internal/matrix/**"
+      - "go.mod"
+      - "go.sum"
+      - ".github/workflows/phase2-agent-context.yml"
+  push:
+    branches:
+      - "feat/phase2-agent-context-cli"
+
+permissions:
+  contents: read
+
+jobs:
+  go:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - run: go test ./...
+      - run: go vet ./...
