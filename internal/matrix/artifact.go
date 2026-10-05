@@ -81,7 +81,7 @@ func BuildArtifact(templatePath string, project Project) ([]byte, error) {
 	snapJSON, _ := json.Marshal(snapshot)
 	projectJSON, _ := json.Marshal(project)
 	for _, p := range []*[]byte{&reposJSON, &metaJSON, &refPackJSON, &snapJSON, &projectJSON} {
-		*p = bytes.ReplaceAll(*p, []byte("</"), []byte("<\/"))
+		*p = bytes.ReplaceAll(*p, []byte("</"), []byte("<\\/"))
 	}
 
 	var ok bool
