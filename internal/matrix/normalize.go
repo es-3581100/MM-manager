@@ -96,8 +96,7 @@ func NormalizeRefGlob(input string) NormalizedRefGlob {
 	sort.Slice(paths, func(i, j int) bool { return paths[i].URL < paths[j].URL })
 	sort.Slice(external, func(i, j int) bool { return external[i].URL < external[j].URL })
 	annotations := []string{}
-	for _, line := range strings.Split(raw, "
-") {
+	for _, line := range strings.Split(raw, "\n") {
 		s := strings.TrimSpace(line)
 		if s == "" || strings.HasPrefix(s, "<ref-block") || strings.HasPrefix(s, "</ref-block") {
 			continue
