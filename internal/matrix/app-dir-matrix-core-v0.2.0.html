@@ -1,0 +1,670 @@
+<!doctype html>
+<!-- Copyright © 2026 es-3581100. ALL RIGHTS RESERVED. No reuse, modification, redistribution, hosting, training use, derivative works, or commercial exploitation without written permission. See LICENSE and LEGAL.md. -->
+<!--
+APP-DIR-MATRIX CORE ARTIFACT
+Status: canonical reusable baseline
+Version: 0.2.0
+Purpose: ref-glob → pinned Git-tree matrix + human/agent reference layer + optional CodeGraph semantic overlay
+Process contract: app_dir_matrix.ingest_ref_glob@1.0.0
+Frozen: 2026-09-28
+-->
+
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>App-Dir Matrix Core v0.2.0 — Agent/User Hyper Index</title>
+<meta name="description" content="Full Git tree matrix and structural connection explorer for KoLmafia, KoLmaf-AI, and related repositories.">
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#0b0f13;--panel:#111820;--panel2:#151f29;--ink:#e7eef5;--muted:#91a0ae;
+  --line:#2a3947;--green:#43d17d;--green2:#163d29;--amber:#e9b949;--blue:#6aa9ff;
+  --violet:#bd8cff;--red:#ff7a7a;--cyan:#58d6dc;--shadow:0 12px 35px rgba(0,0,0,.26);
+  --app:#7bd88f;--root:#6aa9ff;--core:#58d6dc;--trunk:#e9b949;--branch:#bd8cff;--leaf:#9aa8b5;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font:14px/1.45 ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace}
+button,input,select{font:inherit}
+a{color:var(--blue);text-decoration:none} a:hover{text-decoration:underline}
+.topbar{position:sticky;top:0;z-index:50;background:rgba(11,15,19,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.topbar-inner{display:flex;gap:12px;align-items:center;padding:10px 14px;min-height:58px}
+.brand{display:flex;flex-direction:column;min-width:240px}
+.brand strong{font-size:16px;letter-spacing:.03em}.brand span{font-size:11px;color:var(--muted)}
+.toolbar{display:flex;gap:7px;align-items:center;flex-wrap:wrap;flex:1}
+.btn,.iconbtn,.chip{border:1px solid var(--line);background:var(--panel2);color:var(--ink);border-radius:7px;padding:7px 9px;cursor:pointer}
+.btn:hover,.iconbtn:hover,.chip:hover{border-color:#4f6578;background:#192631}
+.btn.primary{background:#163d29;border-color:#2d8552}.btn.warn{background:#3a2d12;border-color:#8c6a21}
+.iconbtn{width:34px;height:34px;display:grid;place-items:center;padding:0}
+.statusline{font-size:11px;color:var(--muted);white-space:nowrap}
+.layout{display:grid;grid-template-columns:330px minmax(0,1fr);min-height:calc(100vh - 58px)}
+.sidebar{border-right:1px solid var(--line);background:var(--panel);min-width:0;display:flex;flex-direction:column;height:calc(100vh - 58px);position:sticky;top:58px}
+.sidehead{display:flex;gap:6px;align-items:center;padding:9px;border-bottom:1px solid var(--line);background:#0f161d}
+.sidehead .grow{flex:1}.side-title{font-weight:700;font-size:12px}
+.sidebody{overflow:auto;flex:1;padding:8px}
+.main{min-width:0;padding:12px;display:grid;grid-template-rows:auto auto auto;gap:12px}
+.panel{border:1px solid var(--line);background:var(--panel);border-radius:10px;box-shadow:var(--shadow);overflow:hidden}
+.panelhead{display:flex;gap:8px;align-items:center;padding:9px 11px;border-bottom:1px solid var(--line);background:#0f161d}
+.panelhead h2{font-size:13px;margin:0}.panelhead .grow{flex:1}
+.searchbar{display:grid;grid-template-columns:minmax(220px,1fr) auto auto auto;gap:7px}
+.searchbar input{width:100%;background:#0c1218;color:var(--ink);border:1px solid var(--line);border-radius:7px;padding:8px 10px}
+.select{background:#0c1218;color:var(--ink);border:1px solid var(--line);border-radius:7px;padding:7px 8px}
+.repo-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:8px;padding:10px}
+.repo-card{border:1px solid var(--line);border-radius:8px;background:#101821;padding:9px}
+.repo-card .r1{display:flex;align-items:center;gap:7px}.repo-card .r1 strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.repo-card p{margin:6px 0;color:var(--muted);font-size:11px}.repo-card .boundary{color:#cdd8e2}
+.badges{display:flex;gap:5px;flex-wrap:wrap}.badge{font-size:10px;padding:2px 6px;border-radius:999px;border:1px solid var(--line);color:#b9c6d2}
+.good{color:var(--green)}.bad{color:var(--red)}.amber{color:var(--amber)}
+.toggle-dot{width:16px;height:16px;border:1px solid #607181;background:transparent;display:inline-grid;place-items:center;cursor:pointer;flex:0 0 auto}
+.toggle-dot.on{border-radius:50%;background:var(--green);border-color:var(--green);box-shadow:0 0 0 2px rgba(67,209,125,.1)}
+.toggle-dot.off{border-radius:2px;background:transparent}
+.tree-row{display:flex;align-items:center;gap:5px;min-height:25px;border-radius:5px;padding-right:4px;white-space:nowrap}
+.tree-row:hover{background:#18232d}.tree-row.focused{background:#1c3340;outline:1px solid #3c6578}
+.caret{width:18px;height:18px;border:0;background:transparent;color:#8798a8;cursor:pointer;padding:0}
+.caret.blank{visibility:hidden}.node-label{overflow:hidden;text-overflow:ellipsis;cursor:pointer;flex:1}
+.node-label .mini{color:#7c8a97;font-size:10px;margin-left:5px}
+.level-application{color:var(--app)}.level-root{color:var(--root)}.level-core{color:var(--core)}
+.level-trunk{color:var(--trunk)}.level-branch{color:var(--branch)}.level-leaves{color:var(--leaf)}
+.cards-toolbar{display:flex;gap:6px;margin-bottom:8px;align-items:center}.cards-toolbar .grow{flex:1}
+.node-card{border:1px solid var(--line);border-radius:8px;background:#101821;margin-bottom:7px}
+.node-card summary{list-style:none;display:flex;align-items:center;gap:7px;padding:8px;cursor:pointer}.node-card summary::-webkit-details-marker{display:none}
+.node-card .body{border-top:1px solid var(--line);padding:8px;color:var(--muted);font-size:11px}
+.arrows{display:flex;gap:5px;margin-top:7px}.arrows button{flex:1}
+.regex-wrap{padding:10px;display:flex;flex-direction:column;gap:9px}
+.regex-presets{display:flex;gap:6px;flex-wrap:wrap}.chip.active{border-color:var(--green);color:#dff9e8;background:#143324}
+.regex-note{font-size:11px;color:var(--muted)}
+.workspace{display:grid;grid-template-columns:minmax(0,1fr);gap:12px}
+.graph-wrap{position:relative;height:500px;background:radial-gradient(circle at 30% 20%,#14202a 0,#0b1117 55%,#090d11 100%);overflow:hidden}
+#graphSvg{width:100%;height:100%;display:block;cursor:grab}#graphSvg.dragging{cursor:grabbing}
+.graph-legend{position:absolute;right:10px;top:10px;border:1px solid var(--line);border-radius:8px;background:rgba(10,15,20,.88);padding:7px;font-size:10px;display:flex;gap:7px;flex-wrap:wrap;max-width:370px}
+.legend-item{display:flex;align-items:center;gap:4px}.swatch{width:8px;height:8px;border-radius:50%}
+.graph-note{position:absolute;left:10px;bottom:10px;background:rgba(10,15,20,.88);border:1px solid var(--line);border-radius:7px;padding:6px 8px;font-size:10px;color:var(--muted);max-width:65%}
+.edge{stroke:#40505e;stroke-width:1;opacity:.48}.edge.semantic{stroke:var(--violet);stroke-width:1.7;stroke-dasharray:5 4;opacity:.9}
+.gnode circle{stroke:#0a0d10;stroke-width:1.5}.gnode text{fill:#dfe9f1;font-size:10px;pointer-events:none}.gnode:hover circle{stroke:#fff;stroke-width:2}
+.matrix-wrap{overflow:auto;max-height:520px}
+table{width:100%;border-collapse:collapse;table-layout:fixed}
+th,td{padding:7px 9px;border-bottom:1px solid #1e2a34;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+th{position:sticky;top:0;background:#111922;z-index:2;font-size:11px;color:#a7b5c1}
+tbody tr{cursor:pointer}tbody tr:hover{background:#16232d}
+.pager{display:flex;gap:7px;align-items:center;padding:8px 10px;border-top:1px solid var(--line);font-size:11px;color:var(--muted)}
+.pager .grow{flex:1}
+.cg-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px}.cg-box{border:1px solid var(--line);border-radius:8px;padding:9px;background:#101821}
+.cg-box h3{font-size:12px;margin:0 0 7px}.cg-box p{font-size:11px;color:var(--muted)}
+pre{white-space:pre-wrap;word-break:break-word;background:#0a1015;border:1px solid var(--line);padding:9px;border-radius:7px;font-size:11px}
+input[type=file]{max-width:100%}
+kbd{border:1px solid #40505f;background:#17212a;border-radius:4px;padding:1px 4px;font-size:10px}
+.hidden{display:none!important}
+.toast{position:fixed;right:14px;bottom:14px;z-index:100;background:#111a22;border:1px solid var(--line);border-radius:8px;padding:9px 11px;box-shadow:var(--shadow);max-width:420px;font-size:11px;display:none}
+.small{font-size:10px;color:var(--muted)}
+@media(max-width:900px){
+ .layout{grid-template-columns:1fr}.sidebar{position:relative;top:auto;height:420px;border-right:0;border-bottom:1px solid var(--line)}
+ .cg-grid{grid-template-columns:1fr}.searchbar{grid-template-columns:1fr 1fr}.brand{min-width:0}
+}
+
+.refpack-grid,.agent-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:10px;padding:10px}
+.ref-card,.agent-box{border:1px solid var(--line);background:#101821;border-radius:8px;padding:10px}
+.ref-card h3,.agent-box h3{margin:0 0 6px;font-size:12px}.ref-card p,.agent-box p{font-size:11px;color:var(--muted)}
+.ref-links{display:flex;gap:5px;flex-wrap:wrap;margin:7px 0}.ref-links a{border:1px solid var(--line);border-radius:999px;padding:3px 6px;font-size:10px}
+.ref-notes{margin:7px 0 0;padding-left:18px;color:#b9c6d2;font-size:11px}.ref-notes li{margin:3px 0}.verified-path{color:var(--green)}
+.agent-box textarea{width:100%;min-height:150px;resize:vertical;background:#0a1015;border:1px solid var(--line);border-radius:7px;color:var(--ink);padding:9px}
+.agent-actions{display:flex;gap:6px;flex-wrap:wrap;margin:7px 0}
+.pipeline{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:7px;padding:0 10px 10px}
+.pipeline-step{border:1px solid var(--line);background:#0e161d;border-radius:7px;padding:8px;font-size:11px}.pipeline-step b{color:var(--cyan)}
+.project-shelf{max-height:280px;overflow:auto;border:1px solid var(--line);border-radius:6px;margin-top:8px}.project-shelf table{font-size:10px}.project-shelf th{position:sticky;top:0}
+
+</style>
+</head>
+<body>
+<script id="embeddedSnapshot" type="application/json">{}</script>
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <strong>App-Dir Matrix Core <span class="badge">v0.2.0</span></strong>
+      <span>portable agent/user structural index · ref-glob compiler · CodeGraph overlay</span>
+    </div>
+    <div class="toolbar">
+      <button class="btn primary" id="loadBtn">Load pinned trees</button>
+      <button class="btn" id="liveBtn">Refresh live branches</button>
+      <button class="btn" id="exportBtn" disabled>Export offline snapshot</button>
+      <button class="btn" id="manifestBtn">Export manifest JSON</button>
+      <span class="statusline" id="globalStatus">manifest ready · trees not hydrated</span>
+    </div>
+  </div>
+</div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <div class="sidehead">
+      <button class="iconbtn" id="sideModeBtn" title="Toggle tree/card view">☷</button>
+      <div class="grow"><div class="side-title" id="sideTitle">Tree</div></div>
+      <button class="btn" id="allOnBtn">All on</button>
+      <button class="btn" id="allOffBtn">All off</button>
+    </div>
+    <div class="sidebody" id="treePane"></div>
+    <div class="sidebody hidden" id="cardsPane"></div>
+  </aside>
+
+  <main class="main">
+    <section class="panel">
+      <div class="panelhead">
+        <h2>Repository deployments</h2><div class="grow"></div>
+        <span class="small">green = hydrated · amber = manifest only · red = failed/drift</span>
+      </div>
+      <div class="repo-strip" id="repoStrip"></div>
+    </section>
+
+    <section class="panel">
+      <div class="panelhead">
+        <h2>Keyword / regex index</h2><div class="grow"></div>
+        <button class="btn" id="clearFilterBtn">Clear</button>
+      </div>
+      <div class="regex-wrap">
+        <div class="searchbar">
+          <input id="searchInput" placeholder="path / filename / deployment / regex">
+          <select class="select" id="searchMode"><option value="text">text</option><option value="regex">regex</option></select>
+          <select class="select" id="kindFilter"><option value="all">files + dirs</option><option value="blob">files only</option><option value="tree">dirs only</option></select>
+          <label class="btn"><input type="checkbox" id="caseToggle"> Aa</label>
+        </div>
+        <div class="regex-presets" id="regexPresets"></div>
+        <div class="regex-note">Regex runs against <code>repo/path + deployment + level</code>. It filters the matrix and prunes the graph to matches + their ancestors. The structural level is deterministic path depth: application → root → core → trunk → branch → leaves.</div>
+      </div>
+    </section>
+
+    <div class="workspace">
+      <section class="panel">
+        <div class="panelhead">
+          <h2>Connection plane</h2><div class="grow"></div>
+          <label class="btn"><input type="checkbox" id="graphFilesToggle"> include files</label>
+          <button class="btn" id="fitGraphBtn">Fit</button>
+          <button class="btn" id="clearFocusBtn">Clear focus</button>
+        </div>
+        <div class="graph-wrap">
+          <svg id="graphSvg" viewBox="0 0 1200 500" role="img" aria-label="Layered repository tree graph">
+            <g id="graphViewport"><g id="edgeLayer"></g><g id="nodeLayer"></g></g>
+          </svg>
+          <div class="graph-legend" id="graphLegend"></div>
+          <div class="graph-note" id="graphNote">Structural edges are parent→child Git-tree relationships. Semantic CodeGraph edges appear dashed when imported.</div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panelhead">
+          <h2>File tree matrix</h2><div class="grow"></div>
+          <span class="small" id="matrixCount">0 rows</span>
+        </div>
+        <div class="matrix-wrap">
+          <table>
+            <thead><tr><th style="width:54%">File name</th><th style="width:28%">Deployment</th><th style="width:18%">Level</th></tr></thead>
+            <tbody id="matrixBody"></tbody>
+          </table>
+        </div>
+        <div class="pager">
+          <button class="btn" id="prevPage">←</button><span id="pageLabel">page 1</span><button class="btn" id="nextPage">→</button>
+          <div class="grow"></div><select class="select" id="pageSize"><option>100</option><option selected>250</option><option>500</option><option>1000</option></select>
+        </div>
+      </section>
+
+
+<section class="panel" id="forAgent">
+ <div class="panelhead"><h2>For Agent · Ref Glob → HTML Matrix</h2><div class="grow"></div><span class="badge">MCP-shaped contract v1.0.0</span><button class="btn" id="exportContractBtn">Export contract</button></div>
+ <div class="agent-grid">
+  <div class="agent-box"><h3>Ref Glob Compiler</h3><p>Paste mixed Markdown links, escaped URLs, repository paths and notes. This browser stage only normalizes and emits an ingestion envelope; a connected agent/MCP must resolve GitHub metadata, verify recursive trees/subpaths, pin SHAs and regenerate the artifact.</p><textarea id="refGlobInput" placeholder="paste <ref-block> ... URLs ... notes ..."></textarea><div class="agent-actions"><button class="btn primary" id="compileRefGlobBtn">Compile ref glob</button><button class="btn" id="exportEnvelopeBtn">Export MCP request</button><button class="btn" id="clearRefGlobBtn">Clear</button></div><pre id="refGlobReport">No ref glob compiled yet.</pre></div>
+  <div class="agent-box"><h3>Machine contract</h3><p>Annotations, repository metadata, Git-tree structure, verified subpaths, derived display levels and CodeGraph semantic edges stay separate evidence classes.</p><pre id="mcpContractPre"></pre></div>
+ </div>
+ <div class="pipeline">
+  <div class="pipeline-step"><b>1 · Capture</b><br>Preserve raw ref glob + human notes.</div>
+  <div class="pipeline-step"><b>2 · Normalize</b><br>Decode escaped/Markdown URLs; dedupe and classify.</div>
+  <div class="pipeline-step"><b>3 · Resolve</b><br>Resolve repo metadata + actual default branch; never assume main/master/dev.</div>
+  <div class="pipeline-step"><b>4 · Pin tree</b><br>Fetch recursive Git tree; flag truncation; record tree SHA + counts.</div>
+  <div class="pipeline-step"><b>5 · Verify paths</b><br>Check explicitly named subpaths independently.</div>
+  <div class="pipeline-step"><b>6 · Classify</b><br>Attach deployment/source/boundary/ref-pack; derive level only from depth.</div>
+  <div class="pipeline-step"><b>7 · Render</b><br>Cards + sidebar + File/Deployment/Level matrix + structural graph.</div>
+  <div class="pipeline-step"><b>8 · Semantic overlay</b><br>Use CodeGraph JSON; never infer calls/imports from filenames.</div>
+  <div class="pipeline-step"><b>9 · Emit</b><br>Versioned HTML + manifest + ref pack + SHA-256.</div>
+ </div>
+</section>
+
+
+      <section class="panel">
+        <div class="panelhead"><h2>CodeGraph semantic overlay</h2><div class="grow"></div><span class="small" id="cgStatus">0 semantic edges</span></div>
+        <div class="cg-grid">
+          <div class="cg-box">
+            <h3>Local CodeGraph handoff</h3>
+            <p>This HTML deliberately does not infer calls/imports from filenames. Use CodeGraph locally for symbol/call/dependency truth, then import JSON to overlay semantic edges on the structural tree.</p>
+<pre>cd /path/to/repo
+codegraph init
+codegraph status --json
+codegraph files . --json &gt; codegraph-files.json
+codegraph explore "entrypoints architecture call paths" --json &gt; codegraph-explore.json
+codegraph ui .</pre>
+            <div class="small">The importer is permissive: it scans JSON for common edge shapes such as from/to, source/target, caller/callee and file/path references.</div>
+          </div>
+          <div class="cg-box">
+            <h3>Import CodeGraph JSON</h3>
+            <p>Choose one or more JSON outputs. Resolved file-level links are drawn as dashed semantic edges. Unresolved symbol-only edges are counted but not fabricated.</p>
+            <input type="file" id="cgInput" accept=".json,application/json" multiple>
+            <div class="arrows">
+              <button class="btn" id="clearCgBtn">Clear overlay</button>
+              <button class="btn" id="exportCgBtn">Export resolved edges</button>
+            </div>
+            <pre id="cgReport">No CodeGraph data imported.</pre>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+const REPOS = [{"repo":"donCannoli-burns/kol-agent-sandbox","branch":"main","treeSha":"daf49f9a1ab143555bcc9b7fb8eee7c9c8994a7a","entries":12,"files":8,"dirs":4,"deployment":"sandbox","sourceClass":"don","description":"Isolated agent testing around a pinned /loathers/kolmafia-mock","boundary":"Safe proving ground; mock failure never authorizes live fallback"},{"repo":"donCannoli-burns/tokens-of-loathing","branch":"v3","treeSha":"5ff383e73a94aa966b8c315d680e287c5a3ed4a5","entries":147,"files":118,"dirs":29,"deployment":"typed-data","sourceClass":"don","description":"Typed KoL game data through SQLite plus client/API/MCP compatibility surfaces","boundary":"Queryable facts, not live execution authority"},{"repo":"donCannoli-burns/kol-agent-memory","branch":"main","treeSha":"277ea08647fc080a974994fb589a14d88f292025","entries":23,"files":16,"dirs":7,"deployment":"local-memory","sourceClass":"don","description":"KoLmafia-local structured memory with SYSTEM / STATE / LOCAL / ROUTING planes","boundary":"Context can survive; routing indexes do not become live-state authority"},{"repo":"donCannoli-burns/kolmafia-skills","branch":"main","treeSha":"6a716b36ab19e0c8a2662ff354a9322e395c9875","entries":14,"files":9,"dirs":5,"deployment":"skill-bus","sourceClass":"don","description":"KoLmafia-native task-guidance / skill bus using a spaceless /skill@... namespace","boundary":"Skill text is guidance, not permission"},{"repo":"donCannoli-burns/kol-ash-it-down","branch":"main","treeSha":"b832575a2a3d7e5e6fb2f080923424dc73dc00b4","entries":43,"files":31,"dirs":12,"deployment":"document-bridge","sourceClass":"don","description":"Bounded local document/edit/convert bridge, gCLI correlation evidence, session-tail capture, and local audit memory","boundary":"Not a second KoL mutation executor"},{"repo":"donCannoli-burns/kol-goblin-docs","branch":"main","treeSha":"6c4c516c312a79a6eeeff164982ddebcce79fff0","entries":44,"files":25,"dirs":19,"deployment":"docs-map","sourceClass":"don","description":"Agent-first HTML5 map of the local KoLmafia tree and editable runtime documentation","boundary":"Navigation/context only; documentation does not grant authority"},{"repo":"donCannoli-burns/kol-html-matrix","branch":"main","treeSha":"caa77c9dedde07727f0aa2a553ca24247d6c052a","entries":13,"files":9,"dirs":4,"deployment":"relay-matrix","sourceClass":"don","description":"Human relay UI plus machine-readable KoLmafia scripting/retrieval matrix","boundary":"Reference/retrieval only; provenance helps grounding, not authorization"},{"repo":"donCannoli-burns/kingdomsitter","branch":"main","treeSha":"a9272673d55a7df87c4d9bae930c4292e5c7d1a1","entries":75,"files":47,"dirs":28,"deployment":"language-sidecar","sourceClass":"don","description":"Go + Tree-sitter ASH language sidecar with typed IR, agent-readable analysis, and ASH \u2192 TypeScript/Libram emission","boundary":"Language/tooling bridge only in v0; KoLmafia remains authoritative for live game state and mutations"},{"repo":"kolmafia/kolmafia","branch":"main","treeSha":"e6b2e7edee4535061db491b0c46a7837c6a3c23d","entries":4057,"files":3925,"dirs":132,"deployment":"official-core","sourceClass":"official","description":"Official KoLmafia application source tree","boundary":"Upstream application/runtime reference"},{"repo":"kolmafia/homebrew-kolmafia","branch":"main","treeSha":"45f44cce284c58e016cb8a570b116394a58394bf","entries":8,"files":5,"dirs":3,"deployment":"homebrew","sourceClass":"official","description":"Official Homebrew packaging surface for KoLmafia","boundary":"Distribution/installation surface"},{"repo":"kolmafia/kolmafia-ingest","branch":"main","treeSha":"df134df9cb4c863ac32b2015e9f7e977a4533506","entries":8,"files":8,"dirs":0,"deployment":"ingest","sourceClass":"official","description":"Official KoLmafia ingest repository","boundary":"Ingest/data pipeline surface"},{"repo":"kolmafia/multitool","branch":"main","treeSha":"c8c25b872e9d11c3654850f3ac21eb9bd94b57cc","entries":45,"files":28,"dirs":17,"deployment":"multitool","sourceClass":"official","description":"Official KoLmafia multitool repository","boundary":"Tooling/reference surface"},{"repo":"donCannoli-burns/kolmaf-ai-desktop","branch":"main","treeSha":"6ba015317d1886abf0426d040338aacfd62432b5","entries":13,"files":10,"dirs":3,"deployment":"desktop-ui","sourceClass":"don","description":"Desktop/UI reference for the KoLmaf-AI surface","boundary":"User-facing reference/deployment surface","site":"http://doncannoli-burns.github.io/kolmaf-ai-desktop/"}];
+const BUILD_META = {"version":"0.2.0","builtAt":"2026-09-28","source":"GitHub recursive Git Trees API + normalized human reference layer","verifiedEntries":4502,"verifiedFiles":4239,"verifiedDirs":263,"repositoryCount":13,"codegraphReference":"https://github.com/colbymchenry/codegraph","refGlobContract":"app_dir_matrix.ingest_ref_glob@1.0.0"};
+const MATRIX_MCP_CONTRACT = {"name":"app_dir_matrix.ingest_ref_glob","version":"1.0.0","purpose":"Convert a heterogeneous human/agent reference glob into a pinned structural HTML application matrix without confusing notes, file structure, or semantic dependency evidence.","inputSchema":{"type":"object","required":["ref_glob"],"properties":{"ref_glob":{"type":"string","description":"Raw URLs, Markdown links, escaped links, notes and grouped reference text."},"deployment_hint":{"type":"string"},"source_class":{"type":"string","enum":["owned","official","reference","unknown"]},"include_recursive_trees":{"type":"boolean","default":true},"semantic_overlay":{"type":"string","enum":["none","codegraph-json"],"default":"none"}}},"pipeline":["capture_raw_ref_glob","normalize_escaped_urls_and_markdown","dedupe_urls_without_dropping_human_notes","classify_github_repo_github_subpath_external_doc_and_annotation","resolve_each_github_repo_default_branch_and_metadata","fetch_recursive_git_tree_at_branch_or_pin","reject_or_flag_truncated_tree","record_root_tree_sha_entry_file_and_directory_counts","verify_explicitly_named_github_subpaths","assign_deployment_source_class_boundary_and_ref_pack_id","derive_application_root_core_trunk_branch_leaves_from_path_depth","render_repository_cards_tree_matrix_and_structural_parent_child_graph","keep_reference_notes_in_reference_layer","optionally_import_codegraph_json_for_semantic_edges","emit_versioned_html_manifest_and_sha256"],"evidenceClasses":{"annotation":"Human/user supplied note. Context only.","repo_metadata":"Repository identity/default branch/visibility.","git_tree":"Pinned structural evidence for paths and hierarchy.","verified_subpath":"Named path existence check.","semantic_graph":"CodeGraph-derived calls/imports/dependency or impact relationships.","derived_level":"Deterministic display classification from path depth; not a source-code semantic claim."},"invariants":["A reference note never becomes execution authority.","A Git tree proves structure, not call relationships.","Semantic edges are never fabricated from filenames.","Truncated recursive trees are flagged and must not be presented as complete.","Default branches are resolved rather than assumed; pins are recorded.","A failed mock/reference lookup never authorizes a live fallback.","Human annotations, mechanically verified facts, and static-analysis edges remain visually distinguishable.","Every generated artifact is versioned and hashable."],"outputSchema":{"html_matrix":"self-contained HTML application/tree browser","manifest":"repository pins, counts, deployment classes and provenance","ref_pack":"normalized reference notes and links","semantic_overlay":"optional resolved CodeGraph edges","integrity":"SHA-256 of emitted artifact"}};
+const REF_PACK = null;
+const LEVELS=["application","root","core","trunk","branch","leaves"];
+const LEVEL_COLOR={application:"#7bd88f",root:"#6aa9ff",core:"#58d6dc",trunk:"#e9b949",branch:"#bd8cff",leaves:"#9aa8b5"};
+const PRESETS={
+  safety:"(safe|safety|audit|guard|deny|allow|boundary|risk|reconcile|proof|gate|policy)",
+  authority:"(authority|authori[sz]e|permission|confirm|capability|privilege)",
+  mutation:"(mutat|write|execute|submit|adventure|fight|choice|cli_execute|kolcli)",
+  state:"(state|snapshot|session|property|memory|cache|ledger|history)",
+  auth:"(pwd|token|cookie|credential|secret|login|logout|csrf|auth)",
+  relay:"(relay|http|api|endpoint|route|request|response|browser)",
+  agent:"(agent|mcp|tool|skill|prompt|context|routing|worker|actor)",
+  tests:"(test|mock|fixture|smoke|fuzz|spec|golden)",
+  data:"(sqlite|sql|db|database|json|ya?ml|csv|schema|manifest)",
+  docs:"(readme|docs?|index|html|markdown|\\.md$)",
+  build:"(build|deploy|docker|gradle|go\\.mod|cargo|package\\.json|workflow|release)",
+  ash:"(\\.ash$|ash|kolmafia|libram|gcli)"
+};
+
+
+function normalizeRefGlobText(text){return String(text||"").replace(/\\:\/\//g,"://").replace(/https\\:\/\//g,"https://").replace(/http\\:\/\//g,"http://").replace(/\\\//g,"/");}
+function parseRefGlob(text){
+ const raw=normalizeRefGlobText(text),urls=[],md=/\[[^\]]*\]\((https?:\/\/[^)\s]+)\)/g;
+ for(const m of raw.matchAll(md))urls.push(m[1]);
+ const plain=/https?:\/\/[^\s<>"'`]+/g;for(const m of raw.matchAll(plain))urls.push(m[0].replace(/[),.;\\]+$/,""));
+ const repositories=new Map(),subpaths=[],external=[];
+ for(const u of [...new Set(urls)]){try{const x=new URL(u);
+  if(x.hostname==="github.com"||x.hostname==="www.github.com"){const p=x.pathname.split("/").filter(Boolean);if(p.length>=2){const repo=`${p[0]}/${p[1].replace(/\.git$/,"")}`;if(!repositories.has(repo))repositories.set(repo,{repo,url:`https://github.com/${repo}`});if(p.length>2){const mode=p[2];if(mode==="tree"||mode==="blob")subpaths.push({repo,mode,ref:p[3]||null,path:p.slice(4).join("/"),url:u});else subpaths.push({repo,mode:"path",ref:null,path:p.slice(2).join("/"),url:u});}continue;}}
+  external.push({url:u,host:x.hostname});}catch{}}
+ return {raw,repositories:[...repositories.values()],subpaths,external};
+}
+function buildMcpEnvelope(parsed){return {jsonrpc:"2.0",method:"tools/call",params:{name:MATRIX_MCP_CONTRACT.name,arguments:{ref_glob:parsed.raw,include_recursive_trees:true,semantic_overlay:"none",normalized_preview:{repositories:parsed.repositories,subpaths:parsed.subpaths,external_docs:parsed.external}}}};}
+let lastRefEnvelope=null;
+function renderRefGlobCompilation(){const p=parseRefGlob($("#refGlobInput").value);lastRefEnvelope=buildMcpEnvelope(p);$("#refGlobReport").textContent=JSON.stringify({repositories:p.repositories,subpaths:p.subpaths,external_docs:p.external,next:"Agent/MCP: resolve repo metadata → recursive Git trees → verify named subpaths → pin SHAs → regenerate HTML."},null,2);}
+
+const state={
+  rawTrees:new Map(), nodes:new Map(), children:new Map(), roots:[],
+  disabled:new Set(), expanded:new Set(), focusId:null,
+  sideMode:"tree", filter:"", filterMode:"text", caseSensitive:false, kind:"all",
+  activePreset:null, page:0, pageSize:250, graphFiles:false,
+  graph:{scale:1,tx:0,ty:0,drag:false,lastX:0,lastY:0},
+  semanticEdges:[], semanticUnresolved:0, hydrated:false
+};
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+const basename=p=>p.split("/").filter(Boolean).pop()||p;
+const parentPath=p=>{const a=p.split("/");a.pop();return a.join("/")};
+const repoId=r=>`repo:${r}`;
+const nodeId=(r,p)=>p?`${r}:${p}`:repoId(r);
+const repoCfg=r=>REPOS.find(x=>x.repo===r);
+function toast(msg,bad=false){
+  const t=$("#toast");t.textContent=msg;t.style.display="block";t.style.borderColor=bad?"#813b3b":"#345645";
+  clearTimeout(toast._t);toast._t=setTimeout(()=>t.style.display="none",2800);
+}
+function levelFor(depth){
+  if(depth<=0)return"application";
+  if(depth===1)return"root";
+  if(depth===2)return"core";
+  if(depth===3)return"trunk";
+  if(depth===4)return"branch";
+  return"leaves";
+}
+function makeGithubUrl(n){
+  if(n.kind==="repo")return`https://github.com/${n.repo}`;
+  const r=repoCfg(n.repo);return`https://github.com/${n.repo}/blob/${encodeURIComponent(r.branch)}/${n.path}`.replace("/blob/","/"+(n.kind==="tree"?"tree":"blob")+"/");
+}
+function activeNode(id){
+  let cur=state.nodes.get(id);
+  while(cur){
+    if(state.disabled.has(cur.id))return false;
+    cur=cur.parentId?state.nodes.get(cur.parentId):null;
+  }
+  return true;
+}
+function ancestorIds(id){
+  const a=[];let n=state.nodes.get(id);
+  while(n&&n.parentId){a.push(n.parentId);n=state.nodes.get(n.parentId)}
+  return a;
+}
+function buildIndex(){
+  state.nodes.clear();state.children.clear();state.roots=[];
+  const add=n=>{state.nodes.set(n.id,n);if(!state.children.has(n.id))state.children.set(n.id,[]);if(n.parentId){if(!state.children.has(n.parentId))state.children.set(n.parentId,[]);state.children.get(n.parentId).push(n.id)}};
+  for(const r of REPOS){
+    const rid=repoId(r.repo);
+    add({id:rid,repo:r.repo,path:"",name:r.repo.split("/")[1],kind:"repo",depth:0,level:"application",deployment:r.deployment,parentId:null});
+    state.roots.push(rid);
+    const payload=state.rawTrees.get(r.repo);
+    if(!payload)continue;
+    for(const e of payload.tree||[]){
+      const depth=e.path.split("/").length;
+      const pp=parentPath(e.path);
+      add({
+        id:nodeId(r.repo,e.path),repo:r.repo,path:e.path,name:basename(e.path),
+        kind:e.type==="tree"?"tree":"blob",size:e.size??null,sha:e.sha??null,
+        depth,level:levelFor(depth),deployment:r.deployment,
+        parentId:pp?nodeId(r.repo,pp):rid
+      });
+    }
+  }
+  for(const [k,v] of state.children)v.sort((a,b)=>{
+    const A=state.nodes.get(a),B=state.nodes.get(b);
+    if(A.kind!==B.kind)return A.kind==="tree"?-1:1;
+    return A.name.localeCompare(B.name);
+  });
+  if(!state.expanded.size){
+    for(const rid of state.roots){state.expanded.add(rid);for(const c of state.children.get(rid)||[])if(state.nodes.get(c).kind==="tree")state.expanded.add(c)}
+  }
+}
+function embeddedSnapshot(){
+  try{const t=$("#embeddedSnapshot").textContent.trim();const o=JSON.parse(t||"{}");return o&&Object.keys(o).length?o:null}catch{return null}
+}
+async function fetchOne(r,live=false){
+  const ref=live?r.branch:r.treeSha;
+  const u=`https://api.github.com/repos/${r.repo}/git/trees/${encodeURIComponent(ref)}?recursive=1`;
+  const res=await fetch(u,{headers:{"Accept":"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28"}});
+  if(!res.ok)throw new Error(`${res.status} ${res.statusText}`);
+  const data=await res.json();
+  if(data.truncated)throw new Error("GitHub returned truncated recursive tree");
+  return data;
+}
+async function mapLimit(items,limit,fn){
+  let i=0;const out=new Array(items.length);
+  async function worker(){while(true){const idx=i++;if(idx>=items.length)return;try{out[idx]=await fn(items[idx],idx)}catch(e){out[idx]={__error:String(e)}}}}
+  await Promise.all(Array.from({length:Math.min(limit,items.length)},worker));return out;
+}
+async function hydrate(live=false){
+  $("#loadBtn").disabled=true;$("#liveBtn").disabled=true;
+  $("#globalStatus").textContent=live?"refreshing live branches…":"loading pinned tree snapshots…";
+  const emb=!live?embeddedSnapshot():null;
+  if(emb){
+    for(const r of REPOS)if(emb[r.repo])state.rawTrees.set(r.repo,emb[r.repo]);
+  }else{
+    const results=await mapLimit(REPOS,4,r=>fetchOne(r,live));
+    results.forEach((x,i)=>{const r=REPOS[i];if(!x.__error)state.rawTrees.set(r.repo,x);else state.rawTrees.set(r.repo,{__error:x.__error,tree:[]})});
+  }
+  buildIndex();state.hydrated=[...state.rawTrees.values()].some(x=>x.tree?.length);
+  $("#exportBtn").disabled=!state.hydrated;
+  $("#loadBtn").disabled=false;$("#liveBtn").disabled=false;
+  renderAll();
+  const files=[...state.nodes.values()].filter(n=>n.kind==="blob").length;
+  const dirs=[...state.nodes.values()].filter(n=>n.kind==="tree").length;
+  const errors=[...state.rawTrees.entries()].filter(([,v])=>v.__error).length;
+  $("#globalStatus").textContent=`${state.rawTrees.size-errors}/${REPOS.length} repos · ${files} files · ${dirs} dirs${errors?` · ${errors} failed`:""}`;
+  toast(errors?`Hydrated with ${errors} repository error(s)`:`Hydrated ${files+dirs} Git tree entries`,!!errors);
+}
+function repoStatus(r){
+  const p=state.rawTrees.get(r.repo);
+  if(!p)return{cls:"amber",text:"manifest"};
+  if(p.__error)return{cls:"bad",text:"failed"};
+  const count=(p.tree||[]).length;
+  if(count!==r.entries)return{cls:"bad",text:`drift ${count}/${r.entries}`};
+  return{cls:"good",text:"hydrated"};
+}
+function renderRepoStrip(){
+  const out=[];
+  for(const r of REPOS){
+    const s=repoStatus(r);const p=state.rawTrees.get(r.repo);
+    out.push(`<article class="repo-card">
+      <div class="r1"><button class="toggle-dot ${state.disabled.has(repoId(r.repo))?"off":"on"}" data-toggle="${esc(repoId(r.repo))}" title="Toggle subtree"></button>
+      <strong><a href="https://github.com/${esc(r.repo)}" target="_blank" rel="noreferrer">${esc(r.repo)}</a></strong></div>
+      <p>${esc(r.description)}</p><p class="boundary">${esc(r.boundary)}</p>
+      <div class="badges"><span class="badge">${esc(r.deployment)}</span><span class="badge">${esc(r.sourceClass)}</span>
+      <span class="badge">${esc(r.branch)}</span><span class="badge ${s.cls}">${esc(s.text)}</span>
+      <span class="badge">${r.files}f/${r.dirs}d</span>${r.site?`<a class="badge" href="${esc(r.site)}" target="_blank">site ↗</a>`:""}</div>
+    </article>`);
+  }
+  $("#repoStrip").innerHTML=out.join("");
+}
+function searchMatcher(){
+  const q=state.filter;
+  if(!q)return()=>true;
+  if(state.filterMode==="regex"){
+    try{const rx=new RegExp(q,state.caseSensitive?"":"i");return n=>rx.test(`${n.repo}/${n.path} ${n.deployment} ${n.level}`)}catch{return()=>false}
+  }
+  const needle=state.caseSensitive?q:q.toLowerCase();
+  return n=>{const h=`${n.repo}/${n.path} ${n.deployment} ${n.level}`;return(state.caseSensitive?h:h.toLowerCase()).includes(needle)}
+}
+function filteredNodes(includeRepos=false){
+  const match=searchMatcher();
+  return [...state.nodes.values()].filter(n=>{
+    if(!includeRepos&&n.kind==="repo")return false;
+    if(state.kind!=="all"&&n.kind!==state.kind)return false;
+    return activeNode(n.id)&&match(n);
+  });
+}
+function treeFilterSet(){
+  if(!state.filter)return null;
+  const match=searchMatcher(),keep=new Set();
+  for(const n of state.nodes.values())if(match(n)&&activeNode(n.id)){keep.add(n.id);ancestorIds(n.id).forEach(x=>keep.add(x))}
+  return keep;
+}
+function renderTree(){
+  const keep=treeFilterSet();const html=[];
+  function walk(id,indent){
+    const n=state.nodes.get(id);if(!n)return;
+    if(keep&&!keep.has(id))return;
+    const kids=state.children.get(id)||[];const has=kids.length>0;
+    const expanded=state.expanded.has(id)||!!keep;
+    const on=activeNode(id);
+    html.push(`<div class="tree-row ${state.focusId===id?"focused":""}" style="padding-left:${indent*14}px" data-row="${esc(id)}">
+      <button class="caret ${has?"":"blank"}" data-expand="${esc(id)}">${has?(expanded?"▾":"▸"):"·"}</button>
+      <button class="toggle-dot ${state.disabled.has(id)?"off":"on"}" data-toggle="${esc(id)}" title="${state.disabled.has(id)?"Enable":"Disable"} subtree"></button>
+      <span class="node-label level-${n.level}" data-focus="${esc(id)}" title="${esc(n.repo+(n.path?"/"+n.path:""))}">${esc(n.name)}<span class="mini">${esc(n.level)}</span></span>
+    </div>`);
+    if(has&&expanded&&on)for(const c of kids)walk(c,indent+1);
+  }
+  for(const r of state.roots)walk(r,0);
+  $("#treePane").innerHTML=html.join("")||`<div class="small">No matching nodes.</div>`;
+}
+function sibling(id,dir){
+  const n=state.nodes.get(id);if(!n?.parentId)return null;const a=state.children.get(n.parentId)||[];const i=a.indexOf(id);return a[i+dir]||null
+}
+function focus(id){
+  if(!state.nodes.has(id))return;state.focusId=id;
+  ancestorIds(id).forEach(x=>state.expanded.add(x));
+  renderTree();renderCards();renderGraph();
+}
+function renderCards(){
+  const pane=$("#cardsPane");let arr=filteredNodes(true);
+  if(!state.filter)arr=arr.filter(n=>n.kind==="repo"||n.depth<=2);
+  const max=300;const shown=arr.slice(0,max);
+  const h=[`<div class="cards-toolbar"><button class="btn" id="openAllCards">Open all</button><button class="btn" id="closeAllCards">Close all</button><span class="grow"></span><span class="small">${shown.length}${arr.length>max?` / ${arr.length}`:""} cards</span></div>`];
+  for(const n of shown){
+    const kids=state.children.get(n.id)||[];const p=n.parentId;const prev=sibling(n.id,-1),next=sibling(n.id,1);
+    h.push(`<details class="node-card">
+      <summary><button class="toggle-dot ${state.disabled.has(n.id)?"off":"on"}" data-toggle="${esc(n.id)}"></button>
+      <span class="level-${n.level}" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1">${esc(n.name)}</span>
+      <span class="badge">${esc(n.level)}</span><button class="iconbtn" data-toggle="${esc(n.id)}" title="close/off">×</button></summary>
+      <div class="body"><div>${esc(n.repo+(n.path?"/"+n.path:""))}</div><div>deployment: ${esc(n.deployment)} · children: ${kids.length}</div>
+      <div class="arrows"><button class="btn" ${p?"":"disabled"} data-nav="${esc(p||"")}">↑</button>
+      <button class="btn" ${prev?"":"disabled"} data-nav="${esc(prev||"")}">←</button>
+      <button class="btn" ${next?"":"disabled"} data-nav="${esc(next||"")}">→</button>
+      <button class="btn" ${kids[0]?"":"disabled"} data-nav="${esc(kids[0]||"")}">↓</button></div></div></details>`);
+  }
+  pane.innerHTML=h.join("");
+  $("#openAllCards")?.addEventListener("click",()=>pane.querySelectorAll("details").forEach(x=>x.open=true));
+  $("#closeAllCards")?.addEventListener("click",()=>pane.querySelectorAll("details").forEach(x=>x.open=false));
+}
+function toggleNode(id){
+  if(state.disabled.has(id))state.disabled.delete(id);else state.disabled.add(id);
+  renderAll(false);
+}
+function renderPresets(){
+  $("#regexPresets").innerHTML=Object.entries(PRESETS).map(([k,v])=>`<button class="chip ${state.activePreset===k?"active":""}" data-preset="${k}" title="${esc(v)}">${esc(k)}</button>`).join("");
+}
+function matrixRows(){
+  return filteredNodes(false).sort((a,b)=>a.repo.localeCompare(b.repo)||a.path.localeCompare(b.path));
+}
+function renderMatrix(){
+  const arr=matrixRows(),pages=Math.max(1,Math.ceil(arr.length/state.pageSize));state.page=Math.max(0,Math.min(state.page,pages-1));
+  const start=state.page*state.pageSize,part=arr.slice(start,start+state.pageSize);
+  $("#matrixBody").innerHTML=part.map(n=>`<tr data-focus="${esc(n.id)}" title="${esc(n.repo+"/"+n.path)}"><td class="level-${n.level}">${n.kind==="tree"?"▸ ":""}${esc(n.name)}</td><td>${esc(n.deployment)}</td><td>${esc(n.level)}</td></tr>`).join("");
+  $("#matrixCount").textContent=`${arr.length} rows`;$("#pageLabel").textContent=`page ${state.page+1} / ${pages}`;
+  $("#prevPage").disabled=state.page<=0;$("#nextPage").disabled=state.page>=pages-1;
+}
+function graphCandidateIds(){
+  const keep=new Set(),match=searchMatcher();
+  if(state.focusId){
+    let stack=[state.focusId],count=0;ancestorIds(state.focusId).forEach(x=>keep.add(x));
+    while(stack.length&&count<900){const id=stack.shift();const n=state.nodes.get(id);if(!n||!activeNode(id))continue;keep.add(id);count++;
+      for(const c of state.children.get(id)||[]){const cn=state.nodes.get(c);if(cn.kind!=="blob"||state.graphFiles||state.filter)stack.push(c)}
+    }
+  } else if(state.filter){
+    for(const n of state.nodes.values())if(activeNode(n.id)&&match(n)&&(state.kind==="all"||n.kind===state.kind)){keep.add(n.id);ancestorIds(n.id).forEach(x=>keep.add(x));if(keep.size>1200)break}
+  } else {
+    for(const n of state.nodes.values()){
+      if(!activeNode(n.id))continue;
+      if(n.kind==="repo"||n.kind==="tree"&&n.depth<=4||(state.graphFiles&&n.kind==="blob"&&n.depth<=3))keep.add(n.id);
+    }
+  }
+  return [...keep].filter(id=>state.nodes.has(id));
+}
+function nearestIncludedParent(n,set){
+  let p=n.parentId;while(p&&!set.has(p)){p=state.nodes.get(p)?.parentId||null}return p;
+}
+function renderGraph(){
+  const ids=graphCandidateIds(),set=new Set(ids),nodes=ids.map(id=>state.nodes.get(id));
+  const byLevel=new Map(LEVELS.map(l=>[l,[]]));nodes.forEach(n=>byLevel.get(n.level).push(n));
+  for(const a of byLevel.values())a.sort((x,y)=>x.repo.localeCompare(y.repo)||x.path.localeCompare(y.path));
+  const W=1200,H=500,padX=60,padY=28,step=(W-padX*2)/(LEVELS.length-1);
+  const pos=new Map();
+  LEVELS.forEach((l,i)=>{
+    const arr=byLevel.get(l),gap=(H-padY*2)/Math.max(1,arr.length);
+    arr.forEach((n,j)=>pos.set(n.id,{x:padX+i*step,y:padY+gap*(j+.5)}));
+  });
+  const edges=[];
+  for(const n of nodes){const p=nearestIncludedParent(n,set);if(p)edges.push([p,n.id,"structural"])}
+  for(const e of state.semanticEdges){if(set.has(e.from)&&set.has(e.to))edges.push([e.from,e.to,"semantic"])}
+  $("#edgeLayer").innerHTML=edges.map(([a,b,k])=>{const p=pos.get(a),q=pos.get(b);if(!p||!q)return"";const mx=(p.x+q.x)/2;return`<path class="edge ${k==="semantic"?"semantic":""}" d="M ${p.x} ${p.y} C ${mx} ${p.y}, ${mx} ${q.y}, ${q.x} ${q.y}" fill="none"/>`}).join("");
+  $("#nodeLayer").innerHTML=nodes.map(n=>{const p=pos.get(n.id),r=n.kind==="repo"?7:n.kind==="tree"?5:3.4;const label=n.kind==="repo"?n.name:(n.name.length>22?n.name.slice(0,20)+"…":n.name);return`<g class="gnode" transform="translate(${p.x},${p.y})" data-focus="${esc(n.id)}"><circle r="${r}" fill="${LEVEL_COLOR[n.level]}"/><text x="${r+4}" y="3">${esc(label)}</text><title>${esc(n.repo+(n.path?"/"+n.path:""))}</title></g>`}).join("");
+  $("#graphNote").textContent=`${nodes.length} visible nodes · ${edges.filter(e=>e[2]==="structural").length} structural edges · ${edges.filter(e=>e[2]==="semantic").length} semantic edges. ${ids.length>=900?"Focused graph capped for readability. ":""}Matrix still indexes all hydrated entries.`;
+  applyGraphTransform();
+}
+function applyGraphTransform(){
+  const g=state.graph;$("#graphViewport").setAttribute("transform",`translate(${g.tx} ${g.ty}) scale(${g.scale})`);
+}
+function fitGraph(){state.graph.scale=1;state.graph.tx=0;state.graph.ty=0;applyGraphTransform()}
+function renderLegend(){
+  $("#graphLegend").innerHTML=LEVELS.map(l=>`<span class="legend-item"><span class="swatch" style="background:${LEVEL_COLOR[l]}"></span>${l}</span>`).join("")+`<span class="legend-item"><span style="width:15px;border-top:2px dashed ${LEVEL_COLOR.branch}"></span>semantic</span>`;
+}
+function renderAgentContract(){const p=$("#mcpContractPre");if(p)p.textContent=JSON.stringify(MATRIX_MCP_CONTRACT,null,2);}
+function renderAll(full=true){
+  if(full)renderRepoStrip();else renderRepoStrip();
+  renderPresets();renderTree();renderCards();renderMatrix();renderGraph();renderLegend();renderAgentContract();
+}
+function download(name,text,type="text/plain"){
+  const b=new Blob([text],{type}),u=URL.createObjectURL(b),a=document.createElement("a");a.href=u;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000)
+}
+function exportManifest(){
+  const m={build:BUILD_META,repositories:REPOS.map(r=>({...r,loadedSha:state.rawTrees.get(r.repo)?.sha||null,loadedEntries:state.rawTrees.get(r.repo)?.tree?.length||0}))};
+  download("app-dir-matrix-core.manifest.json",JSON.stringify(m,null,2),"application/json");
+}
+function exportSnapshot(){
+  if(!state.hydrated)return;
+  const snap={};for(const r of REPOS){const p=state.rawTrees.get(r.repo);if(p?.tree)snap[r.repo]={sha:p.sha,truncated:false,tree:p.tree.map(e=>({path:e.path,type:e.type,size:e.size??null,sha:e.sha??null}))}}
+  const clone=document.documentElement.cloneNode(true);
+  const ss=clone.querySelector("#embeddedSnapshot");ss.textContent=JSON.stringify(snap).replace(/<\//g,"<\\/");
+  ["#treePane","#cardsPane","#repoStrip","#matrixBody","#edgeLayer","#nodeLayer"].forEach(sel=>{const e=clone.querySelector(sel);if(e)e.innerHTML=""});
+  const inp=clone.querySelector("#searchInput");if(inp)inp.setAttribute("value","");
+  const out="<!doctype html>\\n"+clone.outerHTML;
+  download("app-dir-matrix-core.offline.html",out,"text/html");
+  toast("Offline hydrated HTML exported");
+}
+function resolveNodeRef(v){
+  if(!v)return null;
+  if(typeof v==="object")v=v.path||v.file||v.filePath||v.name||v.qualifiedName||v.id;
+  if(typeof v!=="string")return null;
+  const clean=v.replace(/^file:\/\//,"").replace(/\\\\/g,"/");
+  for(const n of state.nodes.values())if(n.path&&clean.endsWith(n.path))return n.id;
+  const base=basename(clean),hits=[...state.nodes.values()].filter(n=>n.kind==="blob"&&n.name===base);
+  return hits.length===1?hits[0].id:null;
+}
+function importCgObject(obj){
+  const edges=[];let unresolved=0;
+  const seen=new Set();
+  function add(a,b,meta){
+    const from=resolveNodeRef(a),to=resolveNodeRef(b);if(from&&to&&from!==to){const k=from+"→"+to;if(!seen.has(k)){seen.add(k);edges.push({from,to,meta})}}else if(a&&b)unresolved++;
+  }
+  function walk(x){
+    if(!x||typeof x!=="object")return;
+    if(Array.isArray(x)){x.forEach(walk);return}
+    if("from" in x&&"to" in x)add(x.from,x.to,x);
+    if("source" in x&&"target" in x)add(x.source,x.target,x);
+    if("caller" in x&&"callee" in x)add(x.caller,x.callee,x);
+    if("fromFile" in x&&"toFile" in x)add(x.fromFile,x.toFile,x);
+    for(const v of Object.values(x))walk(v);
+  }
+  walk(obj);return{edges,unresolved};
+}
+async function importCgFiles(files){
+  let all=[],un=0,reports=[];
+  for(const f of files){
+    try{const obj=JSON.parse(await f.text()),r=importCgObject(obj);all=all.concat(r.edges);un+=r.unresolved;reports.push(`${f.name}: ${r.edges.length} resolved, ${r.unresolved} unresolved`)}
+    catch(e){reports.push(`${f.name}: parse error ${e}`)}
+  }
+  const uniq=new Map();all.forEach(e=>uniq.set(e.from+"→"+e.to,e));state.semanticEdges=[...uniq.values()];state.semanticUnresolved=un;
+  $("#cgStatus").textContent=`${state.semanticEdges.length} semantic edges`;
+  $("#cgReport").textContent=reports.join("\\n")||"No CodeGraph data imported.";
+  renderGraph();
+}
+function wireEvents(){
+  document.body.addEventListener("click",e=>{
+    const t=e.target.closest("[data-toggle]");if(t){e.preventDefault();toggleNode(t.dataset.toggle);return}
+    const ex=e.target.closest("[data-expand]");if(ex){const id=ex.dataset.expand;if(state.expanded.has(id))state.expanded.delete(id);else state.expanded.add(id);renderTree();return}
+    const f=e.target.closest("[data-focus]");if(f){focus(f.dataset.focus);return}
+    const n=e.target.closest("[data-nav]");if(n&&n.dataset.nav){focus(n.dataset.nav);return}
+    const p=e.target.closest("[data-preset]");if(p){const k=p.dataset.preset;state.activePreset=state.activePreset===k?null:k;if(state.activePreset){state.filterMode="regex";state.filter=PRESETS[k];$("#searchMode").value="regex";$("#searchInput").value=state.filter}else{state.filter="";$("#searchInput").value=""}state.page=0;renderAll();return}
+  });
+  $("#loadBtn").addEventListener("click",()=>hydrate(false));$("#liveBtn").addEventListener("click",()=>hydrate(true));
+  $("#manifestBtn").addEventListener("click",exportManifest);$("#exportBtn").addEventListener("click",exportSnapshot);
+  $("#allOnBtn").addEventListener("click",()=>{state.disabled.clear();renderAll()});
+  $("#allOffBtn").addEventListener("click",()=>{state.disabled=new Set(state.roots);renderAll()});
+  $("#sideModeBtn").addEventListener("click",()=>{state.sideMode=state.sideMode==="tree"?"cards":"tree";$("#treePane").classList.toggle("hidden",state.sideMode!=="tree");$("#cardsPane").classList.toggle("hidden",state.sideMode!=="cards");$("#sideModeBtn").textContent=state.sideMode==="tree"?"☷":"▦";$("#sideTitle").textContent=state.sideMode==="tree"?"Tree":"Cards"});
+  $("#searchInput").addEventListener("input",e=>{state.filter=e.target.value;state.activePreset=null;state.page=0;renderAll()});
+  $("#searchMode").addEventListener("change",e=>{state.filterMode=e.target.value;state.page=0;renderAll()});
+  $("#caseToggle").addEventListener("change",e=>{state.caseSensitive=e.target.checked;renderAll()});
+  $("#kindFilter").addEventListener("change",e=>{state.kind=e.target.value;state.page=0;renderAll()});
+  $("#clearFilterBtn").addEventListener("click",()=>{state.filter="";state.activePreset=null;$("#searchInput").value="";state.page=0;renderAll()});
+  $("#pageSize").addEventListener("change",e=>{state.pageSize=+e.target.value;state.page=0;renderMatrix()});
+  $("#prevPage").addEventListener("click",()=>{state.page--;renderMatrix()});$("#nextPage").addEventListener("click",()=>{state.page++;renderMatrix()});
+  $("#graphFilesToggle").addEventListener("change",e=>{state.graphFiles=e.target.checked;renderGraph()});
+  $("#fitGraphBtn").addEventListener("click",fitGraph);$("#clearFocusBtn").addEventListener("click",()=>{state.focusId=null;renderAll()});
+  $("#cgInput").addEventListener("change",e=>importCgFiles([...e.target.files]));
+  $("#clearCgBtn").addEventListener("click",()=>{state.semanticEdges=[];state.semanticUnresolved=0;$("#cgStatus").textContent="0 semantic edges";$("#cgReport").textContent="No CodeGraph data imported.";renderGraph()});
+  $("#exportCgBtn").addEventListener("click",()=>download("app-dir-matrix-core.codegraph-edges.json",JSON.stringify({resolved:state.semanticEdges,unresolved:state.semanticUnresolved},null,2),"application/json"));
+
+  $("#compileRefGlobBtn")?.addEventListener("click",renderRefGlobCompilation);
+  $("#clearRefGlobBtn")?.addEventListener("click",()=>{$("#refGlobInput").value="";lastRefEnvelope=null;$("#refGlobReport").textContent="No ref glob compiled yet."});
+  $("#exportEnvelopeBtn")?.addEventListener("click",()=>{if(!lastRefEnvelope)renderRefGlobCompilation();download("app-dir-matrix.mcp-request.json",JSON.stringify(lastRefEnvelope,null,2),"application/json")});
+  $("#exportContractBtn")?.addEventListener("click",()=>download("app-dir-matrix.mcp-contract.json",JSON.stringify(MATRIX_MCP_CONTRACT,null,2),"application/json"));
+  $("#exportRefPackBtn")?.addEventListener("click",()=>download("app-dir-matrix.ref-pack.json",JSON.stringify(REF_PACK,null,2),"application/json"));
+
+  const svg=$("#graphSvg");
+  svg.addEventListener("wheel",e=>{e.preventDefault();const d=e.deltaY<0?1.12:.89;state.graph.scale=Math.min(4,Math.max(.35,state.graph.scale*d));applyGraphTransform()},{passive:false});
+  svg.addEventListener("pointerdown",e=>{state.graph.drag=true;state.graph.lastX=e.clientX;state.graph.lastY=e.clientY;svg.setPointerCapture(e.pointerId);svg.classList.add("dragging")});
+  svg.addEventListener("pointermove",e=>{if(!state.graph.drag)return;state.graph.tx+=e.clientX-state.graph.lastX;state.graph.ty+=e.clientY-state.graph.lastY;state.graph.lastX=e.clientX;state.graph.lastY=e.clientY;applyGraphTransform()});
+  svg.addEventListener("pointerup",e=>{state.graph.drag=false;svg.classList.remove("dragging")});
+}
+function boot(){
+  wireEvents();renderAll();
+  const emb=embeddedSnapshot();
+  if(emb){hydrate(false)}
+  else hydrate(false);
+}
+boot();
+</script>
+</body>
+</html>
