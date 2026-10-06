@@ -21,6 +21,8 @@ func main() {
 	switch os.Args[1] {
 	case "build":
 		err = cmdBuild(os.Args[2:])
+	case "materialize-ui":
+		err = cmdMaterializeUI(os.Args[2:])
 	case "verify":
 		err = cmdVerify(os.Args[2:])
 	case "compare":
@@ -42,7 +44,7 @@ func main() {
 }
 
 func usage() {
-	fmt.Fprintln(os.Stderr, "appdir-matrix <normalize|pin|build|verify|compare|agent> [flags]")
+	fmt.Fprintln(os.Stderr, "appdir-matrix <normalize|pin|build|materialize-ui|verify|compare|agent> [flags]")
 	fmt.Fprintln(os.Stderr, "appdir-matrix agent <bootstrap|resolve|inspect|expand|scope|verify-receipt> [flags]")
 }
 
@@ -69,6 +71,38 @@ func cmdBuild(args []string) error {
 		return err
 	}
 	fmt.Printf("built %s\nsha256 %s\n", *out, h)
+	return nil
+}
+
+func cmdMaterializeUI(args []string) error {
+	fs := flag.NewFlagSet("materialize-ui", flag.ContinueOnError)
+	projectPath := fs.String("project", "", "project JSON")
+	out := fs.String("out", "", "output HTML; defaults to matrix.html next to the project JSON")
+	if err := fs.Parse(args); err != nil {
+		return err
+	}
+	if *projectPath == "" {
+		return fmt.Errorf("--project is required")
+	}
+
+	cleanProject := filepath.Clean(*projectPath)
+	outPath := *out
+	if outPath == "" {
+		outPath = filepath.Join(filepath.Dir(cleanProject), "matrix.html")
+	}
+
+	p, err := matrix.LoadProject(cleanProject)
+	if err != nil {
+		return err
+	}
+	if err := os.MkdirAll(filepath.Dir(outPath), 0o755); err != nil {
+		return err
+	}
+	h, err := matrix.WriteCanonicalArtifact(p, outPath)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("materialized %s\nsha256 %s\n", outPath, h)
 	return nil
 }
 
