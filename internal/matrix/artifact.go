@@ -38,6 +38,10 @@ func BuildArtifact(templatePath string, project Project) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
+	return buildArtifactValidated(tpl, project)
+}
+
+func buildArtifactValidated(tpl []byte, project Project) ([]byte, error) {
 	text := string(tpl)
 
 	repos := make([]uiRepo, 0, len(project.Repositories))
@@ -135,6 +139,10 @@ func WriteArtifact(templatePath string, project Project, outPath string) (string
 	if err != nil {
 		return "", err
 	}
+	return writeArtifactBytes(b, outPath)
+}
+
+func writeArtifactBytes(b []byte, outPath string) (string, error) {
 	if err := os.WriteFile(outPath, b, 0o644); err != nil {
 		return "", err
 	}
